@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CombinedData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Data>
+    <BaseData xsi:type="CardData">
+      <Name>TestCard</Name>
+      <Id>471975402</Id>
+      <Icon>8a51ae53ef306d646bb6ce855905d66a</Icon>
+      <DisplayName>Test Card</DisplayName>
+      <SpawnTime>0</SpawnTime>
+      <SpawnCount>0</SpawnCount>
+      <Creature>0</Creature>
+    </BaseData>
+  </Data>
+</CombinedData>

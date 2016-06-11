@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Goblin Game" basedir=".">
+  
+  <taskdef resource="taskdefs.xml" classpath="${basedir}/External/Tools/aws-java-sdk-ant-tasks-1.2.3.jar" />
+  
+  <!-- Dependencies -->
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+  <property file="buildsetting.properties"/>
+  <property environment="env"/>
+  <property name="RAW_BUILD_NUMBER" value="${env.BUILD_NUMBER}"/>
+  <script language="javascript">
+    <![CDATA[
+        var buildNum = parseInt(project.getProperty("RAW_BUILD_NUMBER"))
+        var minorBuildNumber = buildNum % 100;
+        var majorBuildNumber = (Math.floor(buildNum / 100)) % 100;
+        var uberBuildNumber = (Math.floor(buildNum / 10000)) % 100;
+        project.setProperty("minorBuildNumber", minorBuildNumber);
+        project.setProperty("majorBuildNumber", majorBuildNumber);
+        project.setProperty("uberBuildNumber", uberBuildNumber);
+    ]]>
+  </script>
+
+  <tstamp>
+    <format property="TODAY_STAMP" pattern="yyyy_MM_dd" locale="en,US"/>
+  </tstamp>
+  <tstamp>
+    <format property="MONTH_STAMP" pattern="M" locale="en,US"/>
+  </tstamp>
+  <property name="VERSION_NUM" value="${uberBuildNumber}.${majorBuildNumber}.${minorBuildNumber}"/>
+  <property name="VERSION_STRING" value="goblin_${env.P4_CHANGELIST}"/>
+
+  <!-- Global Config -->
+  <property name="product.name" value="Skeleton Game"/>
+  <property name="product.code" value="sk"/>
+  <property name="root.dir" location="${basedir}"/>
+  <property name="external.dir" location="${root.dir}/External"/>
+  <property name="source.dir" location="${root.dir}/Source"/>
+  <property name="pdb2mdb.dir" value="${external.dir}/Tools/pdb2mdb"/>
+  <property name="pdb2mdb.name" value="pdb2mdb.exe"/>
+  <property name="unity.project.dir" value="${root.dir}/GameClient"/>
+  <property name="unity.project.dir.absolute" value="${unity.project.dir}"/>
+  <property name="unity.assemblies.dir" value="${root.dir}/GameClient/Assets/Assemblies"/>
+  <property name="unity.editor.assemblies.dir" value="${root.dir}/GameClient/Assets/Editor/Assemblies"/>
+  <property name="unity.data.dir" value="${root.dir}/GameClient/Assets/Data"/>
+  <property name="build.dir" value="${root.dir}/Build"/>
+  <property name="build.dir.absolute" value="${build.dir}"/>
+  <property name="xcode.bin" value="/usr/bin/xcodebuild"/>
+  <property name="thrifthelper.dir" value="${external.dir}/Tools/thrifthelper"/>
+  <property name="thrifthelper.bin" value="ThriftBuildHelper.exe"/>
+  <property name="source.bin.absolute" value="${source.dir}"/>
+  
+  <!-- LibCommon.csproj Config -->
+  <property name="common.dir" location="${source.dir}/LibCommon"/>
+  <property name="common.debug.dir" location="${common.dir}/bin/Debug"/>
+  <property name="common.release.dir" location="${common.dir}/bin/Release"/>
+  <property name="common.dll.name" value="LibCommon.dll"/>
+  <property name="common.mdb.name" value="${common.dll.name}.mdb"/>
+
+  <!-- LibGameClient.csproj Config -->
+  <property name="gameclient.dir" location="${source.dir}/LibGameClient"/>
+  <property name="gameclient.debug.dir" location="${gameclient.dir}/bin/Debug"/>
+  <property name="gameclient.release.dir" location="${gameclient.dir}/bin/Release"/>
+  <property name="gameclient.dll.name" value="LibGameClient.dll"/>
+  <property name="gameclient.mdb.name" value="${gameclient.dll.name}.mdb"/>
+
+  <!-- LibGameEditor.csproj Config -->
+  <property name="gameeditor.dir" location="${source.dir}/LibGameEditor"/>
+  <property name="gameeditor.debug.dir" location="${gameeditor.dir}/bin/Debug"/>
+  <property name="gameeditor.release.dir" location="${gameeditor.dir}/bin/Release"/>
+  <property name="gameeditor.dll.name" value="LibGameEditor.dll"/>
+  <property name="gameeditor.mdb.name" value="${gameeditor.dll.name}.mdb"/>
+  
+  <!-- LibProtocol.csproj Config -->
+  <property name="protocol.dir" location="${source.dir}/Protocol"/>
+  <property name="protocol.dll.name" value="ThriftLib.dll"/>
+  <property name="protocol.mdb.name" value="${protocol.dll.name}.mdb"/>
+  
+  <property name="gameserver.dir" value="${source.dir}/GameServer"/>
+  
+  <!-- Internal targets and OS specific setup -->
+  <condition property="isWindows">
+    <os family="windows" />
+  </condition>
+
+  <condition property="isMac">
+    <os family="mac" />
+  </condition>
+
+  <condition property="isUnix">
+    <os family="unix" />
+  </condition>
+
+  <target name="if_windows" if="isWindows">
+    <property name="mono" value="${external.dir}\Mono-2.10.8\bin\mono.exe" />
+    <property name="xbuild" value="${external.dir}\Mono-2.10.8\bin\xbuild.bat" />
+    <property name="unity.app" location="C:\Program Files\Unity\Editor\Unity.exe" />
+    <property name="helper.app" location="${thrifthelper.dir}\${thrifthelper.bin}" />
+    <property name="thrift.bin" location="${external.dir}\Tools\thrift\thrift-0.9.1.exe" />
+    <property name="xbuild.bin" location="xbuild" />
+  </target>
+
+  <target name="if_mac" if="isMac">
+    <property name="unity.app" location="/Applications/Unity/Unity.app/Contents/MacOS/Unity" />
+    <property name="helper.app" location="${thrifthelper.dir}\${thrifthelper.bin}" />
+    <property name="thrift.bin" location="${external.dir}\Tools\thrift\thrift" />
+    <property name="xbuild.bin" location="/usr/local/bin/xbuild" />
+  </target>
+
+  <target name="if_unix" if="isUnix">
+  </target>
+
+  <target name="clean-android">
+    <echo message="Cleaning Build Space"/>
+    <delete dir="${build.dir.absolute}/Android/Client"/>
+    <mkdir dir="${build.dir.absolute}/Android/Client"/>
+    <delete dir="${build.dir.absolute}/Android/Assets"/>
+    <mkdir dir="${build.dir.absolute}/Android/Assets"/>
+  </target>
+
+  <target name="clean-ios">
+    <echo message="Cleaning Build Space"/>
+    <delete dir="${build.dir.absolute}/iPhone/Client"/>
+    <mkdir dir="${build.dir.absolute}/iPhone/Client"/>
+   <delete dir="${build.dir.absolute}/iPhone/Assets"/>
+    <mkdir dir="${build.dir.absolute}/iPhone/Assets"/>
+  </target>
+  
+   <target name="clean-win">
+    <echo message="Cleaning Build Space"/>
+    <delete dir="${build.dir.absolute}/StandaloneWindows/Client"/>
+    <mkdir dir="${build.dir.absolute}/StandaloneWindows/Client"/>
+    <delete dir="${build.dir.absolute}/StandaloneWindows/Assets"/>
+    <mkdir dir="${build.dir.absolute}/StandaloneWindows/Assets"/>
+  </target>
+  
+  <target name="clean-mac">
+    <echo message="Cleaning Build Space"/>
+    <delete dir="${build.dir.absolute}/StandaloneMac/Client"/>
+    <mkdir dir="${build.dir.absolute}/StandaloneMac/Client"/>
+    <delete dir="${build.dir.absolute}/StandaloneMac/Assets"/>
+    <mkdir dir="${build.dir.absolute}/StandaloneMac/Assets"/>
+  </target>
+  
+  <target name="clean-gameserver">
+    <echo message="Cleaning Game Server"/>
+    <delete dir="${source.dir.absolute}/GameServer/bin/Debug/Data"/>
+    <mkdir dir="${source.dir.absolute}/GameServer/bin/Debug/Data"/>
+  </target>
+
+
+  <target name="clean-unit-tests">
+    <echo message="Cleaning Build Space"/>
+    <delete dir="${root.dir}/Tests/U­nit"/>
+    <mkdir dir="${root.dir}/Tests/U­nit"/>
+  </target>
+
+  <target name="set-build-number">
+    <echo message="Setting Env build ${VERSION_STRING}"/>
+    <exec executable="ls" dir="." >
+      <env key="VERSION_STRING" value="${VERSION_STRING}"/>
+    </exec>
+  </target>
+
+  <target name="setup-environment" depends="if_windows,if_mac,if_unix" />
+
+  <target name="android" depends="setup-environment, compile-android" />
+  <target name="ios" depends="setup-environment, compile-ios" />
+  <target name="unit-tests" depends="setup-environment, compile-unit-tests" />
+
+  <macrodef name="pdb2mdb">
+    <attribute name="dll.path" default="NOT SET"/>
+    <sequential>
+      <echo message="Running ${pdb2mdb.name} on file: @{dll.path}"/>
+      <exec executable="${pdb2mdb.name}" dir="${pdb2mdb.dir}" resolveexecutable="true" failonerror="true">
+        <arg value="@{dll.path}" />
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <target name="failbuild-on-error">
+    <fail message="Build Failed">
+      <condition>
+        <contains string="${xbuild.output}" substring="Build FAILED." />
+      </condition>
+    </fail>
+  </target>
+
+  <target name="compile-ios" depends="clean-ios">
+
+    <echo message="Compiling unity project for version ${VERSION_STRING}"/>
+
+    <delete file="${unity.data.dir}/CombinedData.xml"/>
+
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-buildTarget ios"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMobileiOSPlayer -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMobileiOSPlayer"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+     <echo message="Assets building ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMobileiOSAssets -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMobileiOSAssets"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Building Data ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod DataCombiner.RebuildCombinedData -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod DataCombiner.RebuildCombinedData"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <replace file="${build.dir.absolute}/iPhone/Client/Goblin/Info.plist" preservelastmodified="true">
+      <replacefilter token="999.999.999" value="${env.P4_CHANGELIST}" />
+    </replace>
+
+    <exec executable="${security.bin}" failonerror="true">
+            <arg value="unlock-keychain"/>
+            <arg line="-p ${keychain.password}"/>
+    </exec>
+
+    <echo message="Building ${build.dir.absolute}/iPhone/Client/Goblin/Unity-iPhone.xcodeproj/ Sym Root ${dev.dir.absolute}/Build/iPhone/"/>
+    <exec executable="${xcode.bin}" failonerror="true">
+      <arg line="-project ${build.dir.absolute}/iPhone/Client/Goblin/Unity-iPhone.xcodeproj/"/>
+      <arg line="PROVISIONING_PROFILE=${provisioning.guid}"/>
+      <arg line="-sdk iphoneos"/>
+      <arg line='CODE_SIGN_IDENTITY="${codesign.identity}"'/>
+      <arg line='GCC_GENERATE_DEBUGGING_SYMBOLS=YES'/>
+      <arg line='DEBUG_INFORMATION_FORMAT=dwarf-with-dsym'/>
+      <arg line='DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT=YES'/>
+      <arg line='DEBUGGING_SYMBOLS=YES'/>
+
+      <arg line="-configuration Release"/>
+    </exec>
+
+    <exec executable="${xcrun.bin}" failonerror="true">
+            <arg line="-sdk iphoneos"/>
+            <arg line="PackageApplication"/>
+            <arg line="-v ${build.dir.absolute}/iPhone/Client/Goblin/build/Release-iphoneos/${app.name}.app"/>
+            <arg line="-o ${build.dir.absolute}/iPhone/Client/Goblin/build/${app.name}.ipa"/>
+    </exec>
+
+    <!--<antcall target="upload-ios" />-->
+    
+    <delete dir="${ios.assets.deploy.folder}/${VERSION_STRING}"/>
+    <mkdir dir="${ios.assets.deploy.folder}/${VERSION_STRING}"/>
+    
+    <copy file="${build.dir.absolute}/iPhone/Client/Goblin/build/${app.name}.ipa" tofile="${ios.build.deploy.folder}/${VERSION_STRING}.ipa"/>
+    <copy file="${unity.data.dir}/CombinedData.xml" todir="${ios.assets.deploy.folder}/${VERSION_STRING}" />
+    <copy todir="${ios.assets.deploy.folder}/${VERSION_STRING}">
+      <fileset dir="${build.dir.absolute}/iPhone/Assets/" />
+    </copy>
+  </target>
+
+
+  <target name="compile-android" depends="clean-android, set-build-number">
+
+    <echo message="Compiling unity project for android version ${VERSION_STRING}"/>
+
+    <delete file="${unity.data.dir}/CombinedData.xml"/>
+
+	  <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-buildTarget android"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+   </exec>
+    <echo message="${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMobileAndroidPlayer -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMobileAndroidPlayer"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Assets building ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMobileAndroidAssets -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMobileAndroidAssets"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Building Data ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod DataCombiner.RebuildCombinedData -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod DataCombiner.RebuildCombinedData"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <!--<antcall target="upload-android" />-->
+    
+    <delete dir="${android.assets.deploy.folder}/${VERSION_STRING}"/>
+    <mkdir dir="${android.assets.deploy.folder}/${VERSION_STRING}"/>
+    
+    <copy file="${build.dir.absolute}/Android/Client/Goblin.apk" tofile="${android.build.deploy.folder}/${VERSION_STRING}.apk"/>
+    
+    <copy file="${unity.data.dir}/CombinedData.xml" todir="${android.assets.deploy.folder}/${VERSION_STRING}" />
+    <copy todir="${android.assets.deploy.folder}/${VERSION_STRING}">
+      <fileset dir="${build.dir.absolute}/Android/Assets/" />
+    </copy>
+  </target>
+  
+  <target name="compile-win" depends="clean-win, set-build-number">
+
+    <echo message="Compiling unity project for windows version ${VERSION_STRING}"/>
+
+    <delete file="${unity.data.dir}/CombinedData.xml"/>
+
+	  <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-buildTarget StandaloneWindows"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+   </exec>
+
+
+    <echo message="${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildWindowsStandalonePlayer -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildWindowsStandalonePlayer"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Assets building ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildWindowsStandaloneAssets -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildWindowsStandaloneAssets"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Building Data ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod DataCombiner.RebuildCombinedData -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod DataCombiner.RebuildCombinedData"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <antcall target="upload-win" />
+  </target>
+  
+  <target name="compile-mac" depends="clean-mac, set-build-number">
+
+    <echo message="Compiling unity project for OSX version ${VERSION_STRING}"/>
+
+    <delete file="${unity.data.dir}/CombinedData.xml"/>
+
+	  <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-buildTarget StandaloneOSXUniversal"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+   </exec>
+   
+    <echo message="${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMacStandalonePlayer -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMacStandalonePlayer"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <echo message="Assets building ${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod BuildTools.BuildMacStandaloneAssets -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="true">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod BuildTools.BuildMacStandaloneAssets"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+
+    <antcall target="upload-mac" />
+  </target>
+
+  <target name="upload-android" if="isMac">
+  </target>
+  
+  <target name="upload-win" if="isMac">
+  </target>
+  
+  <target name="upload-mac" if="isMac">
+  </target>
+
+  <target name="upload-ios" if="isMac">
+  </target>
+
+  <target name="compile-unit-tests" depends="clean-unit-tests, set-build-number">
+
+    <echo message="Running Unit Tests for version ${VERSION_STRING}"/>
+
+    <echo message="${unity.app} -projectPath ${unity.project.dir.absolute} -executeMethod UnityTest.Batch.RunUnitTests -resultFilePath=${root.dir}/Tests/U­nit/results.xml -batchmode -quit"/>
+    <exec executable="${unity.app}" failonerror="false">
+      <arg line="-projectPath ${unity.project.dir.absolute}"/>
+      <arg line="-executeMethod UnityTest.Batch.RunUnitTests"/>
+      <arg line="-resultFilePath=${root.dir}/Tests/U­nit/results.xml"/>
+      <arg line="-batchmode"/>
+      <arg line="-quit"/>
+    </exec>
+  </target>
+
+  <target name="generate-common-mdb" if="isWindows">
+    <pdb2mdb dll.path="${common.debug.dir}/${common.dll.name}"/>
+  </target>
+
+  <target name="copy-common-debug">
+    <antcall target="generate-common-mdb" />
+    <copy file="${common.debug.dir}/${common.dll.name}" todir="${unity.assemblies.dir}"/>
+    <copy file="${common.debug.dir}/${common.mdb.name}" todir="${unity.assemblies.dir}"/>
+    <antcall target="copy-protocol" />
+  </target>
+
+  <target name="copy-common-release">
+    <copy file="${common.release.dir}/${common.dll.name}" todir="${unity.assemblies.dir}"/>
+    <antcall target="copy-protocol" />
+  </target>
+
+  <target name="generate-gameclient-mdb" if="isWindows">
+    <pdb2mdb dll.path="${gameclient.debug.dir}/${gameclient.dll.name}"/>
+  </target>
+
+  <target name="copy-gameclient-debug">
+    <antcall target="generate-gameclient-mdb" />
+    <copy file="${gameclient.debug.dir}/${gameclient.dll.name}" todir="${unity.assemblies.dir}"/>
+    <copy file="${gameclient.debug.dir}/${gameclient.mdb.name}" todir="${unity.assemblies.dir}"/>
+  </target>
+
+  <target name="copy-gameclient-release">
+    <copy file="${gameclient.release.dir}/${gameclient.dll.name}" todir="${unity.assemblies.dir}"/>
+  </target>
+
+  <target name="generate-gameeditor-mdb" if="isWindows">
+    <pdb2mdb dll.path="${gameeditor.debug.dir}/${gameeditor.dll.name}"/>
+  </target>
+
+  <target name="copy-gameeditor-debug">
+    <antcall target="generate-gameeditor-mdb" />
+    <copy file="${gameeditor.debug.dir}/${gameeditor.dll.name}" todir="${unity.editor.assemblies.dir}"/>
+    <copy file="${gameeditor.debug.dir}/${gameeditor.mdb.name}" todir="${unity.editor.assemblies.dir}"/>
+  </target>
+
+  <target name="copy-gameeditor-release">
+    <copy file="${gameeditor.release.dir}/${gameeditor.dll.name}" todir="${unity.editor.assemblies.dir}"/>
+  </target>
+
+  <target name="copy-testharness-debug">
+    <copy file="${testharness.debug.dir}/${testharness.dll.name}" todir="${unity.editor.assemblies.dir}"/>
+  </target>
+
+  <target name="copy-testharness-release">
+    <copy file="${testharness.release.dir}/${testharness.dll.name}" todir="${unity.editor.assemblies.dir}"/>
+  </target>
+  
+  <target name="generate-protocol-mdb" if="isWindows">
+    <pdb2mdb dll.path="${protocol.dir}/${protocol.dll.name}"/>
+  </target>
+  
+  <target name="copy-protocol">
+    <antcall target="generate-protocol-mdb" />
+    <copy file="${protocol.dir}/${protocol.dll.name}" todir="${unity.assemblies.dir}"/>
+    <copy file="${protocol.dir}/${protocol.mdb.name}" todir="${unity.assemblies.dir}"/>
+  </target>
+  
+  <target name="gen-protocol" depends="compile-win-proto, compile-mac-proto">
+     <echo message="Running Protocol"/>
+  </target>
+  
+  <target name="compile-win-proto" depends="setup-environment" if="isWindows">
+    <echo message="Building compile-win-proto"/>
+    
+    <exec executable="${helper.app}" failonerror="true">
+             <arg line="${protocol.dir}"/>
+             <arg line="${thrift.bin}"/>
+             <arg line="${protocol.dir}\"/>
+    </exec>
+  </target>
+  
+  <target name="compile-mac-proto" depends="setup-environment" if="isMac">
+    <echo message="Building compile-mac-proto"/>
+    <exec executable="/usr/local/bin/mono" failonerror="true">
+             <arg line="${helper.app}"/>
+             <arg line="${protocol.dir}"/>
+             <arg line="${thrift.bin}"/>
+             <arg line="${protocol.dir}/"/>
+      </exec>    
+  </target>
+
+  <target name="compile-gameserver" depends="setup-environment">
+    <echo message="Building GameServer"/>
+    
+    <exec executable="${xbuild.bin}" failonerror="true">
+      <arg line="${source.dir}/Skeleton.sln"/>
+      <arg line="/t:GameServer"/>
+    </exec>
+    
+    <antcall target="clean-gameserver" />
+    
+     <copy file="${android.assets.deploy.folder}/${VERSION_STRING}/CombinedData.xml" todir="${source.dir.absolute}/GameServer/bin/Debug/Data"/>
+     
+     <tar destfile="${gameserver.build.deploy.folder}/Goblin_${LAST_GOOD_BUILD}_GameServer.tar"
+     basedir="${source.dir.absolute}/GameServer/bin/Debug/"
+     excludes="mydocs/**, **/todo.html"/>
+     
+     
+     <antcall target="upload-gameserver" />
+     
+  </target>
+  
+   <target name="upload-gameserver" if="isMac">
+  </target>
+
+</project>
+

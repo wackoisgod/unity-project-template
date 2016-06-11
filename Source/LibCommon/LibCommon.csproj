@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B713547E-16B8-40B3-84E2-8006C2CE13DD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LibCommon</RootNamespace>
+    <AssemblyName>LibCommon</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependecies\Thrift\Thrift.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\AssetManifest.cs" />
+    <Compile Include="Assets\AssetStore.cs" />
+    <Compile Include="Base\Flag.cs" />
+    <Compile Include="Data\Attributes\AssetReferenceAttribute.cs" />
+    <Compile Include="Data\Attributes\DataDrawAttribute.cs" />
+    <Compile Include="Data\Attributes\DataReferenceAttribute.cs" />
+    <Compile Include="Data\Attributes\DisplayOrderAttribute.cs" />
+    <Compile Include="Data\Attributes\NonEditableAttribute.cs" />
+    <Compile Include="Data\Attributes\PolymorphicAttribute.cs" />
+    <Compile Include="Data\Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="Data\BaseData.cs" />
+    <Compile Include="Data\CombinedData.cs" />
+    <Compile Include="Data\DataLoader.cs" />
+    <Compile Include="Data\DataStore.cs" />
+    <Compile Include="Data\DataUtils.cs" />
+    <Compile Include="Data\Game\CardData.cs" />
+    <Compile Include="Data\Game\Creature.cs" />
+    <Compile Include="Data\Serializer.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Logging\LogRouter.cs" />
+    <Compile Include="Logging\LogTarget.cs" />
+    <Compile Include="Manager\AssetManager.cs" />
+    <Compile Include="Manager\BaseManager.cs" />
+    <Compile Include="Math\FastRandom.cs" />
+    <Compile Include="Math\Mathf.cs" />
+    <Compile Include="Math\Vector2.cs" />
+    <Compile Include="Math\Vector3.cs" />
+    <Compile Include="Network\BaseNetDriver.cs" />
+    <Compile Include="Network\LoopbackNetDriver.cs" />
+    <Compile Include="Network\ThriftMessageSerialize.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\StreamExtensions.cs" />
+    <Compile Include="Utils\TimeUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LibProtocol\LibProtocol.csproj">
+      <Project>{fafb0b44-3f05-4d4f-afaf-6460a3f31375}</Project>
+      <Name>LibProtocol</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(Configuration) == Debug (
+$(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-debug ) else if $(Configuration) == Release (
+$(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-release ) ELSE (
+echo "Invalid build configuration. Skipping post-build event."
+)</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
