@@ -1,6 +1,8 @@
 # unity-project-template
 Setup for a larger Unity Project
 
+To edit game data select the Game Data menu option/edit
+
 # Folder Structure
 GameClient - Unity Project
 
