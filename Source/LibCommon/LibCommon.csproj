@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,6 +20,11 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-common-debug" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +33,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-common-release" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -36,8 +46,7 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Thrift, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Thrift">
       <HintPath>..\Dependecies\Thrift\Thrift.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -79,13 +88,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibProtocol\LibProtocol.csproj">
-      <Project>{fafb0b44-3f05-4d4f-afaf-6460a3f31375}</Project>
+      <Project>{FAFB0B44-3F05-4D4F-AFAF-6460A3F31375}</Project>
       <Name>LibProtocol</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(Configuration) == Debug (
+  <PropertyGroup Condition="'$(OS)' != 'Unix'">
+      <PostBuildEvent>if $(Configuration) == Debug (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-debug ) else if $(Configuration) == Release (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-release ) ELSE (
 echo "Invalid build configuration. Skipping post-build event."
