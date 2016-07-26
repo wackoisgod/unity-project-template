@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -20,6 +20,11 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-gameeditor-debug" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +33,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-gameeditor-release" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,7 +58,9 @@
     <Reference Include="UnityEditor.UI">
       <HintPath>..\Dependecies\Unity\UnityEditor.UI.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\Dependecies\Unity\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\EditorAssetStore.cs" />
@@ -78,16 +90,16 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibCommon\LibCommon.csproj">
-      <Project>{b713547e-16b8-40b3-84e2-8006c2ce13dd}</Project>
+      <Project>{B713547E-16B8-40B3-84E2-8006C2CE13DD}</Project>
       <Name>LibCommon</Name>
     </ProjectReference>
     <ProjectReference Include="..\LibGameClient\LibGameClient.csproj">
-      <Project>{47689fdd-e174-45d8-8b46-412662158ef9}</Project>
+      <Project>{47689FDD-E174-45D8-8B46-412662158EF9}</Project>
       <Name>LibGameClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' != 'Unix'">
     <PostBuildEvent>if $(Configuration) == Debug (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-gameeditor-debug ) else if $(Configuration) == Release (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-gameeditor-release ) ELSE (
