@@ -2,7 +2,7 @@
 {
   public class CardData : BaseData
   {
-    [AssetReference(AssetReferenceAttribute.AssetReferenceType.Texture)]
+    [AssetReference(AssetType = AssetReferenceAttribute.AssetReferenceType.Texture)]
     public string Icon { get; set; }
 
     public string DisplayName { get; set; }

@@ -8,5 +8,5 @@ insert_final_newline = true
 
 ; 2-column space indentation
 [*.cs]
-indent_style = tab
+indent_style = space
 indent_size = 2

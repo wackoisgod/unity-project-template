@@ -2,16 +2,6 @@
 
 namespace LibCommon.Data
 {
-  public class BundleReferenceAttribute : Attribute
-  {
-    public string BundleName;
-
-    public BundleReferenceAttribute(string name)
-    {
-      BundleName = name;
-    }
-  }
-
   public class AssetReferenceAttribute : DataDrawAttribute
   {
     public enum AssetReferenceType
@@ -23,11 +13,14 @@ namespace LibCommon.Data
       Animation
     }
 
-    public AssetReferenceType AssetType;
+    public AssetReferenceType AssetType { get; set; }
+    public string BundleOverride { get; set; }
+    public string DependentBundle { get; set; }
 
-    public AssetReferenceAttribute(AssetReferenceType assetType)
+    public AssetReferenceAttribute()
     {
-      AssetType = assetType;
+      BundleOverride = String.Empty;
+      DependentBundle = String.Empty;
     }
   }
 }
