@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Assets\EditorAssetStore.cs" />
     <Compile Include="Build\BuildTools.cs" />
+    <Compile Include="Build\Bundles\AssetBundler.cs" />
     <Compile Include="Data\CustomDataDrawerAttribute.cs" />
     <Compile Include="Data\DataCombiner.cs" />
     <Compile Include="Data\DataCreationWindow.cs" />
