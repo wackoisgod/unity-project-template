@@ -75,7 +75,7 @@ namespace LibGameEditor.Build.Bundles
         // we always have the base bundle at index 0
         dataBundles[bundleName] = new Bundle(bundleName, guids, assetPaths);
 
-        ExtractBundleReference(bundleName, info.Data, guids, assetPaths, ref dataBundles);
+        ExtractBundleReference(bundleName, info.Data, ref dataBundles);
       });
 
       foreach (var b in dataBundles)
@@ -143,7 +143,7 @@ namespace LibGameEditor.Build.Bundles
       Serializer.Serialize<AssetManifest>(manifest, inOutputDir + Path.DirectorySeparatorChar + "AssetManifest.xml");
     }
 
-    private static void ExtractBundleReference(string inDataBundleName, object target, List<string> guids, List<string> assetPaths, ref Dictionary<string, Bundle> dataBundles)
+    private static void ExtractBundleReference(string inDataBundleName, object target, ref Dictionary<string, Bundle> dataBundles)
     {
       PropertyInfo[] properties = target.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
       var referenceProperties = from property in properties
@@ -168,8 +168,6 @@ namespace LibGameEditor.Build.Bundles
               if (!customBundle)
               {
                 currentBundle = dataBundles[inDataBundleName];
-                guids.Add(guid);
-                assetPaths.Add(path);
               }
               else
               {
@@ -181,12 +179,13 @@ namespace LibGameEditor.Build.Bundles
                 {
                   dataBundles[attribute.BundleOverride] = currentBundle = new Bundle(attribute.BundleOverride, new List<string>(), new List<string>());
                 }
+
+                // make the parent bundle depend on this custom bundle 
+                dataBundles[inDataBundleName].Dependecies.Add(currentBundle.Name.ToLower());
               }
 
               currentBundle.Guids.Add(guid);
               currentBundle.AssetPaths.Add(path);
-              if (!string.IsNullOrEmpty(attribute.DependentBundle))
-                currentBundle.Dependecies.Add(attribute.DependentBundle.ToLower());
             }
           }
         }
@@ -204,12 +203,12 @@ namespace LibGameEditor.Build.Bundles
               Array array = (Array)subTarget;
               for (int i = 0; i < array.Length; i++)
               {
-                ExtractBundleReference(inDataBundleName, array.GetValue(i), guids, assetPaths, ref dataBundles);
+                ExtractBundleReference(inDataBundleName, array.GetValue(i), ref dataBundles);
               }
             }
             else
             {
-              ExtractBundleReference(inDataBundleName, subTarget, guids, assetPaths, ref dataBundles);
+              ExtractBundleReference(inDataBundleName, subTarget, ref dataBundles);
             }
           }
         }
