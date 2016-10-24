@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using LibCommon.Logging;
 using LibCommon.Manager;
+using LibGameClient.Logging.Targets;
+using Logger = LibCommon.Logging.Logger;
 using UnityEngine;
+
 
 // ReSharper disable UnusedMember.Local
 
@@ -52,6 +56,10 @@ namespace LibGameClient.Manager
         _currentApplicationState = ApplicationState.Invalid;
 
         DontDestroyOnLoad(gameObject);
+
+        // Add in the logger support for the UnityLogTarget
+        LogManager.IsEnabled = true;
+        LogManager.AttachLogTarget(new UnityLogTarget(Logger.Level.Trace, Logger.Level.Error, true));
 
         StartupTime = DateTime.Now;
 

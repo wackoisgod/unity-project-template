@@ -59,6 +59,7 @@
     <Compile Include="Assets\ClientAssetStore.cs" />
     <Compile Include="Data\ClientDataLoader.cs" />
     <Compile Include="Data\UnityAssetLoaders.cs" />
+    <Compile Include="Logging\Targets\UnityLogTarget.cs" />
     <Compile Include="Manager\GameManager.cs" />
     <Compile Include="Manager\UIManager.cs" />
     <Compile Include="Network\HttpNetDriver.cs" />
