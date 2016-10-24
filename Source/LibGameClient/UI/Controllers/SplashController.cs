@@ -9,13 +9,7 @@ namespace LibGameClient.UI.Controllers
     public GameObject PublisherSplash;
     public GameObject CompanySplash;
 
-/*
-    private bool _publisherPlayed = false;
-*/
-/*
-    private bool _companyPlayed = false;
-*/
-
+    // ReSharper disable once UnusedMember.Local
     private void Awake()
     {
       PublisherSplash?.SetActive(false);

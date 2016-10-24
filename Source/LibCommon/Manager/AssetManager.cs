@@ -89,12 +89,13 @@ namespace LibCommon.Manager
       {
         if (_internalAssetQueue.Count > 0)
         {
-          var task = _internalAssetQueue.Dequeue();
+          AssetLoadRequest task = _internalAssetQueue.Dequeue();
           if (task.UseCustomFunction)
           {
             Action handler = null;
             handler = () =>
             {
+              // ReSharper disable once DelegateSubtraction
               task.OnDone -= handler;
 
               OnTaskCompletedAdd(task);
@@ -177,7 +178,7 @@ namespace LibCommon.Manager
 
       while (_internalCompletedQueue.Count != 0)
       {
-        var cpTask = _internalCompletedQueue.Dequeue();
+        AssetLoadRequest cpTask = _internalCompletedQueue.Dequeue();
         if (cpTask.HasFailed)
         {
           cpTask.OnFailure();
@@ -191,7 +192,7 @@ namespace LibCommon.Manager
 
     public void LoadManifestFile(byte[] inData)
     {
-      var manifestfile = Serializer.Deserialize<AssetManifest>(inData);
+      AssetManifest manifestfile = Serializer.Deserialize<AssetManifest>(inData);
       if (manifestfile != null)
       {
         AssetVersion = manifestfile.version;
@@ -208,7 +209,7 @@ namespace LibCommon.Manager
       }
     }
 
-    public AssetManifest.BundleInfo GetBundleInfoByGUID(string inAssetGUID)
+    public AssetManifest.BundleInfo GetBundleInfoByGuid(string inAssetGuid)
     {
       if (_assetMapping.Count == 0)
       {
@@ -216,7 +217,7 @@ namespace LibCommon.Manager
       }
 
       AssetManifest.BundleInfo data;
-      if (_assetMapping.TryGetValue(inAssetGUID, out data) == false)
+      if (_assetMapping.TryGetValue(inAssetGuid, out data) == false)
       {
         return null;
       }

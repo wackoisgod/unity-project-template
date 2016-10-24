@@ -40,16 +40,16 @@ namespace LibGameEditor.Data.Drawers
       {
         _drawerMap = new Dictionary<Type, DrawerInfo>();
         IEnumerable<Type> drawers = from assembly in AppDomain.CurrentDomain.GetAssemblies()
-          from t in assembly.GetTypes()
-          where t.IsSubclassOf(typeof(DataDrawer))
-          select t;
+                                    from t in assembly.GetTypes()
+                                    where t.IsSubclassOf(typeof(DataDrawer))
+                                    select t;
         foreach (Type drawer in drawers)
         {
           IEnumerable<CustomDataDrawerAttribute> drawnTypes = from attr in drawer.GetCustomAttributes(typeof(CustomDataDrawerAttribute), false)
-            select (attr as CustomDataDrawerAttribute);
+                                                              select (attr as CustomDataDrawerAttribute);
           foreach (CustomDataDrawerAttribute drawn in drawnTypes)
           {
-            _drawerMap.Add(drawn.Type, new DrawerInfo {DrawerType = drawer, Attr = drawn});
+            _drawerMap.Add(drawn.Type, new DrawerInfo { DrawerType = drawer, Attr = drawn });
           }
         }
       }
@@ -104,8 +104,11 @@ namespace LibGameEditor.Data.Drawers
               value = Activator.CreateInstance(property.PropertyType, 0);
             }
             Array arrayValue = value as Array;
+
             if (arrayValue != null)
             {
+              Type t = arrayValue.GetType().GetElementType();
+
               for (int i = 0; i < arrayValue.Length; i++)
               {
                 EditorGUI.indentLevel++;
@@ -120,21 +123,29 @@ namespace LibGameEditor.Data.Drawers
                 EditorGUILayout.BeginVertical();
                 drawer = GetDrawer(property, element, true, typeof(DefaultDrawer));
                 DataDrawer drawerInstance = Activator.CreateInstance(drawer) as DataDrawer;
-                drawerInstance?.Draw(element, i.ToString(), property, output => { arrayValue.SetValue(output, index); });
+                drawerInstance?.Draw(element, i.ToString(), property, output =>
+                {
+                    // ReSharper disable once AccessToModifiedClosure
+                    arrayValue?.SetValue(output, index);
+                });
                 EditorGUILayout.EndVertical();
                 GUI.backgroundColor = Color.red;
+
                 if (GUILayout.Button("X"))
                 {
-                  Array copy = Array.CreateInstance(arrayValue.GetType().GetElementType(), arrayValue.Length - 1);
-                  if (i > 0)
+                  if (t != null)
                   {
-                    Array.Copy(arrayValue, 0, copy, 0, i);
+                    Array copy = Array.CreateInstance(t, arrayValue.Length - 1);
+                    if (i > 0)
+                    {
+                      Array.Copy(arrayValue, 0, copy, 0, i);
+                    }
+                    if (i < arrayValue.Length - 1)
+                    {
+                      Array.Copy(arrayValue, i + 1, copy, i, arrayValue.Length - i - 1);
+                    }
+                    arrayValue = copy;
                   }
-                  if (i < arrayValue.Length - 1)
-                  {
-                    Array.Copy(arrayValue, i + 1, copy, i, arrayValue.Length - i - 1);
-                  }
-                  arrayValue = copy;
                 }
                 GUI.backgroundColor = Color.white;
 
@@ -148,10 +159,10 @@ namespace LibGameEditor.Data.Drawers
               }
               GUI.backgroundColor = Color.green;
               EditorGUILayout.BeginHorizontal();
-              GUILayout.Space(EditorGUI.indentLevel*20);
-              if (GUILayout.Button("+ " + arrayValue.GetType().GetElementType().Name))
+              GUILayout.Space(EditorGUI.indentLevel * 20);
+              if (t != null && GUILayout.Button("+ " + t.Name))
               {
-                Array copy = Array.CreateInstance(arrayValue.GetType().GetElementType(), arrayValue.Length + 1);
+                Array copy = Array.CreateInstance(t, arrayValue.Length + 1);
                 if (arrayValue.Length > 0)
                 {
                   Array.Copy(arrayValue, copy, arrayValue.Length);
@@ -159,7 +170,7 @@ namespace LibGameEditor.Data.Drawers
                 arrayValue = copy;
 
                 // we create an instance of the element type and assign it to the array ? 
-                var objectInArray = Activator.CreateInstance(arrayValue.GetType().GetElementType());
+                object objectInArray = Activator.CreateInstance(t);
                 arrayValue.SetValue(objectInArray, arrayValue.Length - 1);
               }
               EditorGUILayout.EndHorizontal();

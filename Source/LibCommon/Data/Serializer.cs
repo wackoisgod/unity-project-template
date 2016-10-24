@@ -39,7 +39,7 @@ namespace LibCommon.Data
 
     public static T Deserialize<T>(string path)
     {
-      return (T) Deserialize(typeof(T), path);
+      return (T)Deserialize(typeof(T), path);
     }
 
     private static object Deserialize(Type dataType, Stream stream, Type[] extraTypes)
@@ -68,7 +68,7 @@ namespace LibCommon.Data
 
     public static T Deserialize<T>(byte[] bytes)
     {
-      return (T) Deserialize(typeof(T), bytes);
+      return (T)Deserialize(typeof(T), bytes);
     }
 
     public static object Deserialize(Type dataType, byte[] bytes)
@@ -104,34 +104,6 @@ namespace LibCommon.Data
       {
         return serializer.CanDeserialize(reader);
       }
-    }
-
-    private static List<Type> GetPolymorphicTypes(object obj)
-    {
-      List<Type> processedTypes = new List<Type>();
-      List<Type> polymorphicTypes = GetPolymorphicTypes(obj.GetType(), processedTypes);
-      PropertyInfo[] properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-      foreach (PropertyInfo p in properties)
-      {
-        object subObj = p.GetValue(obj, null);
-        Array arrayObj = subObj as Array;
-        if (arrayObj != null)
-        {
-          for (int i = 0; i < arrayObj.Length; i++)
-          {
-            object element = arrayObj.GetValue(i);
-            polymorphicTypes.AddRange(GetPolymorphicTypes(element));
-          }
-        }
-        else if (subObj != null
-                 && !subObj.GetType().IsPrimitive
-                 && subObj.GetType() != typeof(string))
-        {
-          polymorphicTypes.AddRange(GetPolymorphicTypes(subObj));
-        }
-      }
-
-      return polymorphicTypes;
     }
 
     private static List<Type> GetPolymorphicTypes(Type t, List<Type> processedTypes)

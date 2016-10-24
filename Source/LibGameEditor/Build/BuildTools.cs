@@ -34,7 +34,8 @@ namespace LibGameEditor.Build
     {
       BuildOptions buildOptions = debug ? (BuildOptions.AllowDebugging | BuildOptions.Development) : BuildOptions.None;
 
-      string productName = "goblin";
+      const string productName = "goblin";
+
       try
       {
         PlayerSettings.bundleVersion = "0." + Environment.GetEnvironmentVariable("P4_CHANGELIST");
@@ -44,7 +45,7 @@ namespace LibGameEditor.Build
         PlayerSettings.bundleVersion = "0xd3adb33f";
       }
 
-      var buildPath = Application.dataPath + "/../../Build" + deployPath + productName.Replace(" ", "") + ext;
+      string buildPath = Application.dataPath + "/../../Build" + deployPath + productName.Replace(" ", "") + ext;
 
       EditorUserBuildSettings.SwitchActiveBuildTarget(buildTarget);
       BuildPipeline.BuildPlayer(levels, buildPath, buildTarget, buildOptions);

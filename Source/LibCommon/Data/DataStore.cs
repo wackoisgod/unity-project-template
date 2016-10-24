@@ -36,7 +36,7 @@ namespace LibCommon.Data
 
     public static int[] GetAllIds(Type dataType)
     {
-      var ids = from data in Instance._data.Values
+      IEnumerable<int> ids = from data in Instance._data.Values
         where data.GetType() == dataType
         select data.Id;
       return ids.ToArray();

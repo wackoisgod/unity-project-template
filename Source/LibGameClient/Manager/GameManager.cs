@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using LibCommon.Manager;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Local
+
 namespace LibGameClient.Manager
 {
   public class GameManager : MonoBehaviour
@@ -59,7 +61,7 @@ namespace LibGameClient.Manager
 
     private void SetupManagers()
     {
-      List<BaseManager> mm = new List<BaseManager> {new AssetManager(), new UIManager()};
+      List<BaseManager> mm = new List<BaseManager> { new AssetManager(), new UIManager() };
 
       _managers = mm.ToArray();
       foreach (BaseManager c in _managers)
@@ -69,9 +71,11 @@ namespace LibGameClient.Manager
     }
 
     private bool _started;
-      public string GAMESERVERURL;
 
-      private void Start()
+    // ReSharper disable once InconsistentNaming
+    public string GAMESERVERURL;
+
+    private void Start()
     {
       if (!_started)
       {

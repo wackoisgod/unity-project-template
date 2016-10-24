@@ -47,8 +47,8 @@ namespace LibGameClient.Manager
       UIRootGameObject = GameObject.FindGameObjectWithTag("UIRoot");
       UnityEngine.Object.DontDestroyOnLoad(UIRootGameObject);
 
-      var controllers = UIRootGameObject.GetComponentsInChildren<UIController>(true);
-      foreach (var item in controllers)
+      UIController[] controllers = UIRootGameObject.GetComponentsInChildren<UIController>(true);
+      foreach (UIController item in controllers)
       {
         _controllers.Add(item);
       }
@@ -66,7 +66,6 @@ namespace LibGameClient.Manager
     {
       if (toState == fromState) return;
 
-      UILocation oldUILocation = CurrentLocation;
       switch (toState)
       {
         case GameManager.ApplicationState.Invalid:
@@ -80,8 +79,6 @@ namespace LibGameClient.Manager
         case GameManager.ApplicationState.MainMenu:
           PushUIController(UIControllerID.MainMenu);
           break;
-        default:
-          break;
       }
     }
 
@@ -90,24 +87,24 @@ namespace LibGameClient.Manager
       return _controllers;
     }
 
-    public UIController GetUIController(UIControllerID inID)
+    public UIController GetUIController(UIControllerID inId)
     {
       try
       {
-        var controller = _controllers.Find(x => x.ID == inID);
+        UIController controller = _controllers.Find(x => x.Id == inId);
         return controller;
       }
       catch (Exception)
       {
-        Debug.LogError("Can't find ID " + inID);
+        Debug.LogError("Can't find ID " + inId);
       }
 
       return null;
     }
 
-    public void PushUIController(UIControllerID inID, bool bringToFront = false)
+    public void PushUIController(UIControllerID inId, bool bringToFront = false)
     {
-      var controller = GetUIController(inID);
+      UIController controller = GetUIController(inId);
       if (controller != null)
       {
         controller.Show();
@@ -120,9 +117,9 @@ namespace LibGameClient.Manager
       }
     }
 
-    public void PopUIController(UIControllerID inID)
+    public void PopUIController(UIControllerID inId)
     {
-      var controller = GetUIController(inID);
+      UIController controller = GetUIController(inId);
       controller?.Hide();
     }
   }

@@ -18,7 +18,7 @@ namespace LibGameClient.Data
             }
 
             //Use the manifest to pull the url
-            AssetBundleLoader request = AssetBundleLoader.FromGUID(guid);
+            AssetBundleLoader request = AssetBundleLoader.FromGuid(guid);
             if (request == null) return;
 
             request.OnCompleteLoading += asset =>
@@ -39,7 +39,7 @@ namespace LibGameClient.Data
 
         public override void LoadBulkAssetInternal(string bundleName, Action onLoadCompleteCallback)
         {
-            BulkAssetBundleLoader request = BulkAssetBundleLoader.FromGUIDS(bundleName);
+            BulkAssetBundleLoader request = BulkAssetBundleLoader.FromGuids(bundleName);
 
             if (request == null) return;
 
@@ -50,16 +50,16 @@ namespace LibGameClient.Data
 
                 List<Object> assetBundle = bulkAssetBundleLoader.AssetObjects.ToList();
                 List<string> assetNames = bulkAssetBundleLoader.AssetNames.ToList();
-                List<string> assetGUIDS = bulkAssetBundleLoader.AssetGUIDs.ToList();
+                List<string> assetGuids = bulkAssetBundleLoader.AssetGuiDs.ToList();
 
-                foreach (var item in assetBundle)
+                foreach (Object item in assetBundle)
                 {
                     UnityEngine.Debug.Log("looking for " + item.name);
 
                     int index = assetNames.FindIndex(x => x.Contains(item.name));
                     if (index == -1) continue;
 
-                    string guid = assetGUIDS[index];
+                    string guid = assetGuids[index];
                     UnityEngine.Debug.Log("adding asset " + assetNames[index] + " guid" + guid);
                     AddAsset(guid, item);
                 }

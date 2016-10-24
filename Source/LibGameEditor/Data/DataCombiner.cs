@@ -9,20 +9,6 @@ namespace LibGameEditor.Data
   {
     private static CombinedData _combined;
 
-    private static string _cachedLocalPath;
-
-    private static string LocalCombinedPath
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(_cachedLocalPath))
-        {
-          _cachedLocalPath = ClientDataLoader.DataPath.Replace(UnityEngine.Application.dataPath, "Assets");
-        }
-        return _cachedLocalPath;
-      }
-    }
-
     public static void StartEdit()
     {
       if (File.Exists(ClientDataLoader.DataPath)
@@ -87,7 +73,7 @@ namespace LibGameEditor.Data
     private static CombinedData FullBuild()
     {
       EditorDataUtil.DataInfo[] dataInfo = EditorDataUtil.GetAllData();
-      CombinedData output = new CombinedData {Data = new BaseData[dataInfo.Length]};
+      CombinedData output = new CombinedData { Data = new BaseData[dataInfo.Length] };
 
       for (int i = 0; i < dataInfo.Length; i++)
       {

@@ -15,7 +15,7 @@ namespace LibCommon.Logging
         public static Logger CreateLog()
         {
             StackFrame stackFrame = new StackFrame(1, false);
-            string className = stackFrame.GetMethod().DeclaringType.Name;
+            string className = stackFrame.GetMethod().DeclaringType?.Name;
 
             if (className == null)
                 throw new Exception("Error getting full name for declaring type.");

@@ -13,7 +13,7 @@ namespace LibGameEditor.Data
 
     private class Tab
     {
-      public BaseData Data { get; set; }
+      public BaseData Data { get; }
       public readonly string Path;
 
       public Tab(BaseData inputData, string savePath)

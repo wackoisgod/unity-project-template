@@ -17,7 +17,7 @@ namespace LibGameClient.UI.Controllers
 
     [SerializeField] private UIManager.UIControllerID _controllerId = UIManager.UIControllerID.None;
 
-    public UIManager.UIControllerID ID => _controllerId;
+    public UIManager.UIControllerID Id => _controllerId;
 
     [Serializable]
     public class VisualStateEvent : UnityEvent<UIController, VisualState, bool>

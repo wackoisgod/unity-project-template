@@ -92,6 +92,7 @@ namespace LibGameClient.Data
       }
     }
 
+    // ReSharper disable once UnusedMember.Local
     private void LoadDataPath(byte[] location, Type inType)
     {
       try
@@ -109,7 +110,7 @@ namespace LibGameClient.Data
 
     public void OnXMLLoadComplete(AssetLoadRequest inValue)
     {
-      var xmlAssetLoader = inValue as XMLAssetLoader;
+      XMLAssetLoader xmlAssetLoader = inValue as XMLAssetLoader;
       CombinedData data = xmlAssetLoader?.Content as CombinedData;
       if (data != null)
       {
