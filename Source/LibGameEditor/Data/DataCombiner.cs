@@ -13,13 +13,9 @@ namespace LibGameEditor.Data
     {
       if (File.Exists(ClientDataLoader.DataPath)
           && Serializer.CanDeserialize(typeof(CombinedData), ClientDataLoader.DataPath))
-      {
         _combined = Serializer.Deserialize<CombinedData>(ClientDataLoader.DataPath);
-      }
       else
-      {
         _combined = FullBuild();
-      }
     }
 
     public static void EndEdit()
@@ -43,9 +39,7 @@ namespace LibGameEditor.Data
         if (_combined.Data[i].Id != id) continue;
 
         for (int j = i; j < _combined.Data.Length - 1; j++)
-        {
           _combined.Data[j] = _combined.Data[j + 1];
-        }
         BaseData[] data = _combined.Data;
         Array.Resize(ref data, _combined.Data.Length - 1);
         _combined.Data = data;
@@ -73,12 +67,10 @@ namespace LibGameEditor.Data
     private static CombinedData FullBuild()
     {
       EditorDataUtil.DataInfo[] dataInfo = EditorDataUtil.GetAllData();
-      CombinedData output = new CombinedData { Data = new BaseData[dataInfo.Length] };
+      CombinedData output = new CombinedData {Data = new BaseData[dataInfo.Length]};
 
       for (int i = 0; i < dataInfo.Length; i++)
-      {
         output.Data[i] = dataInfo[i].Data;
-      }
       return output;
     }
   }

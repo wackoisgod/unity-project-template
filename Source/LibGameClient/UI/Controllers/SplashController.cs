@@ -19,13 +19,9 @@ namespace LibGameClient.UI.Controllers
     public void OnVisualStateChange(UIController inController, UIController.VisualState inState, bool inValue)
     {
       if (inState == UIController.VisualState.Shown)
-      {
         InitSplashScreen();
-      }
       else
-      {
         gameObject.SetActive(false);
-      }
     }
 
     public void InitSplashScreen()

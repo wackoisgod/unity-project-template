@@ -13,9 +13,9 @@ namespace LibCommon.Math
       public uint _x, _y, _z, _w;
     }
 
-    const double REAL_UNIT_INT = 1.0 / (int.MaxValue + 1.0);
-    const double REAL_UNIT_UINT = 1.0 / (uint.MaxValue + 1.0);
-    const uint Y = 842502087, Z = 3579807591, W = 273326509;
+    private const double REAL_UNIT_INT = 1.0/(int.MaxValue + 1.0);
+    private const double REAL_UNIT_UINT = 1.0/(uint.MaxValue + 1.0);
+    private const uint Y = 842502087, Z = 3579807591, W = 273326509;
 
     public uint _x;
     public uint _y;
@@ -44,7 +44,7 @@ namespace LibCommon.Math
 
     public RandomCache GetCache()
     {
-      return new RandomCache { _x = _x, _y = _y, _z = _z, _w = _w };
+      return new RandomCache {_x = _x, _y = _y, _z = _z, _w = _w};
     }
 
     public void CacheValues()
@@ -65,10 +65,10 @@ namespace LibCommon.Math
 
     public void Reinitialise(int seed)
     {
-      _x = (uint)((seed * 1431655781)
-                   + (seed * 1183186591)
-                   + (seed * 622729787)
-                   + (seed * 338294347));
+      _x = (uint) (seed*1431655781
+                   + seed*1183186591
+                   + seed*622729787
+                   + seed*338294347);
 
       _y = Y;
       _z = Z;
@@ -83,13 +83,11 @@ namespace LibCommon.Math
         _x = _y;
         _y = _z;
         _z = _w;
-        _w = (_w ^ (_w >> 19)) ^ (t ^ (t >> 8));
+        _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
 
         uint rtn = _w & 0x7FFFFFFF;
         if (rtn == 0x7FFFFFFF)
-        {
           continue;
-        }
         return (int) rtn;
       }
     }
@@ -97,16 +95,14 @@ namespace LibCommon.Math
     public int Next(int upperBound)
     {
       if (upperBound < 0)
-      {
         throw new ArgumentOutOfRangeException(nameof(upperBound), upperBound, "upperBound must be >=0");
-      }
 
       uint t = _x ^ (_x << 11);
       _x = _y;
       _y = _z;
       _z = _w;
 
-      return (int)((REAL_UNIT_INT * (int)(0x7FFFFFFF & (_w = (_w ^ (_w >> 19)) ^ (t ^ (t >> 8))))) * upperBound);
+      return (int) (REAL_UNIT_INT*(int) (0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)))*upperBound);
     }
 
     public int NextInt()
@@ -115,7 +111,7 @@ namespace LibCommon.Math
       _x = _y;
       _y = _z;
       _z = _w;
-      return (int)(0x7FFFFFFF & (_w = (_w ^ (_w >> 19)) ^ (t ^ (t >> 8))));
+      return (int) (0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)));
     }
   }
 }

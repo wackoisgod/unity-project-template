@@ -16,9 +16,7 @@ namespace LibGameEditor.Data
     protected override void OnGUI()
     {
       if (Callback == null)
-      {
         Callback = DataEditWindow.EditData;
-      }
       base.OnGUI();
     }
   }

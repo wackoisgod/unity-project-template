@@ -20,7 +20,7 @@ namespace LibGameEditor.Data
     {
       get
       {
-        if (_instance == null
+        if ((_instance == null)
             || _dirty)
         {
           _instance = Load();
@@ -83,9 +83,7 @@ namespace LibGameEditor.Data
         if (Data[i].FilePath == path)
         {
           for (int j = i + 1; j < Data.Length; j++)
-          {
             Data[j - 1] = Data[j];
-          }
           Array.Resize(ref Data, Data.Length - 1);
           return;
         }
@@ -97,9 +95,7 @@ namespace LibGameEditor.Data
       for (int i = 0; i < Data.Length; i++)
       {
         if (Data[i].FilePath == path)
-        {
           return Data[i].Id;
-        }
       }
       return -1;
     }

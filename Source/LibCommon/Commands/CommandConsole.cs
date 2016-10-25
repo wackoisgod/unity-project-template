@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using static System.String;
 
 namespace LibCommon.Commands
@@ -10,13 +9,13 @@ namespace LibCommon.Commands
   public class CommandConsole
   {
     private static readonly Dictionary<string, CommandGroup> CommandGroups
-         = new Dictionary<string, CommandGroup>();
+      = new Dictionary<string, CommandGroup>();
 
     public static readonly CommandConsole Instance = new CommandConsole();
     public Action<string> MessageLogged;
 
     [CommandGroup("console", "console operations")]
-    class ConsoleCommandGroup : CommandGroup
+    private class ConsoleCommandGroup : CommandGroup
     {
       [DefaultCommand]
       [Command("help", "display help")]
@@ -26,9 +25,7 @@ namespace LibCommon.Commands
         foreach (KeyValuePair<string, CommandGroup> pair in CommandGroups)
         {
           foreach (CommandAttribute command in pair.Value.CommandAttributes)
-          {
             output += $"{pair.Key} {command.Name}: {command.Help}\n";
-          }
         }
         return output;
       }
@@ -52,7 +49,6 @@ namespace LibCommon.Commands
 
     public void Shutdown()
     {
-    
     }
 
     public void RegisterAssembly(Assembly asm)
@@ -65,11 +61,12 @@ namespace LibCommon.Commands
     {
       if (!type.IsSubclassOf(typeof(CommandGroup))) return false;
 
-      CommandGroupAttribute[] attributes = (CommandGroupAttribute[])type.GetCustomAttributes(typeof(CommandGroupAttribute), true);
+      CommandGroupAttribute[] attributes =
+        (CommandGroupAttribute[]) type.GetCustomAttributes(typeof(CommandGroupAttribute), true);
       if (attributes.Length == 0) return false;
 
       CommandGroupAttribute groupAttribute = attributes[0];
-      CommandGroup commandGroup = (CommandGroup)Activator.CreateInstance(type);
+      CommandGroup commandGroup = (CommandGroup) Activator.CreateInstance(type);
       commandGroup.Register(groupAttribute);
       return RegisterCommandGroup(groupAttribute.Name, commandGroup);
     }

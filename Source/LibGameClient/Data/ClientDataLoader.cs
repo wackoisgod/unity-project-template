@@ -37,11 +37,11 @@ namespace LibGameClient.Data
       {
         try
         {
-          Content = !_useBytes ? Serializer.Deserialize(_dataType, _pathName) : Serializer.Deserialize(_dataType, _bytes);
+          Content = !_useBytes
+            ? Serializer.Deserialize(_dataType, _pathName)
+            : Serializer.Deserialize(_dataType, _bytes);
           if (Content == null)
-          {
             HasFailed = true;
-          }
 
           IsDone = true;
         }
@@ -115,9 +115,7 @@ namespace LibGameClient.Data
       if (data != null)
       {
         foreach (BaseData instance in data.Data)
-        {
           DataStore.AddData(instance);
-        }
       }
 
       OnLoadingComplete(0);

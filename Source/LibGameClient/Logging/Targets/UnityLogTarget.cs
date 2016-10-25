@@ -41,6 +41,5 @@ namespace LibGameClient.Logging.Targets
         }
       }
     }
-
   }
 }

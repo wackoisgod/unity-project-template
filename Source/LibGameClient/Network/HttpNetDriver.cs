@@ -30,7 +30,7 @@ namespace LibGameClient.Network
 
       // Example URL ? 
       _wwwPollingRequest =
-          new AsyncPollingWebLoader(_coreGamserverUrl + "/match/" + gameId + "/player/" + _userId + "/inbox");
+        new AsyncPollingWebLoader(_coreGamserverUrl + "/match/" + gameId + "/player/" + _userId + "/inbox");
       _wwwSendMessageRequest = new AsyncPostWebLoader(_coreGamserverUrl + "/match/" + gameId + "/send");
 
       _wwwPollingRequest.OnCompleteLoading += OnServerPacker;
@@ -48,9 +48,10 @@ namespace LibGameClient.Network
       {
         ee = ClientQueue.Dequeue();
       }
-      else if (inQueue == QueueType.Server)
+      else
       {
-        ee = ServerQueue.Dequeue();
+        if (inQueue == QueueType.Server)
+          ee = ServerQueue.Dequeue();
       }
 
       return ee;
@@ -62,9 +63,10 @@ namespace LibGameClient.Network
       {
         ClientQueue.Enqueue(inMsg);
       }
-      else if (inQueue == QueueType.Server)
+      else
       {
-        ServerQueue.Enqueue(inMsg);
+        if (inQueue == QueueType.Server)
+          ServerQueue.Enqueue(inMsg);
       }
     }
 
@@ -73,9 +75,7 @@ namespace LibGameClient.Network
       string msg = ThriftMessageSerialize.Serialize(inMsg);
 
       if (inQueue == QueueType.Client)
-      {
         ClientQueue.Enqueue(inMsg);
-      }
       else
       {
         _wwwSendMessageRequest.PostData = Encoding.UTF8.GetBytes(msg);

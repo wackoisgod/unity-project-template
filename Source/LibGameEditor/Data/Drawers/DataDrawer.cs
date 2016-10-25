@@ -40,30 +40,29 @@ namespace LibGameEditor.Data.Drawers
       {
         _drawerMap = new Dictionary<Type, DrawerInfo>();
         IEnumerable<Type> drawers = from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                                    from t in assembly.GetTypes()
-                                    where t.IsSubclassOf(typeof(DataDrawer))
-                                    select t;
+          from t in assembly.GetTypes()
+          where t.IsSubclassOf(typeof(DataDrawer))
+          select t;
         foreach (Type drawer in drawers)
         {
-          IEnumerable<CustomDataDrawerAttribute> drawnTypes = from attr in drawer.GetCustomAttributes(typeof(CustomDataDrawerAttribute), false)
-                                                              select (attr as CustomDataDrawerAttribute);
+          IEnumerable<CustomDataDrawerAttribute> drawnTypes =
+            from attr in drawer.GetCustomAttributes(typeof(CustomDataDrawerAttribute), false)
+            select attr as CustomDataDrawerAttribute;
           foreach (CustomDataDrawerAttribute drawn in drawnTypes)
-          {
-            _drawerMap.Add(drawn.Type, new DrawerInfo { DrawerType = drawer, Attr = drawn });
-          }
+            _drawerMap.Add(drawn.Type, new DrawerInfo {DrawerType = drawer, Attr = drawn});
         }
       }
       DrawerInfo output = null;
       Type drawnType = fieldType;
       do
       {
-      } while (drawnType != null
-               && !(_drawerMap.TryGetValue(drawnType, out output)
-                    && ((fieldType == drawnType)
-                        || output.Attr.UseForSubclass)
-                    || (drawnType = drawnType.BaseType) == null)
-        );
-      if (output == null
+      } while ((drawnType != null)
+               && !((_drawerMap.TryGetValue(drawnType, out output)
+                     && ((fieldType == drawnType)
+                         || output.Attr.UseForSubclass))
+                    || ((drawnType = drawnType.BaseType) == null))
+      );
+      if ((output == null)
           && fieldType.IsEnum)
       {
         if (fieldType.GetCustomAttributes(typeof(FlagsAttribute), false).Any())
@@ -78,9 +77,7 @@ namespace LibGameEditor.Data.Drawers
     {
       PropertyInfo[] properties = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
       foreach (PropertyInfo p in properties)
-      {
         DrawProperty(p, obj);
-      }
     }
 
     public static void DrawProperty(PropertyInfo property, object root)
@@ -100,9 +97,7 @@ namespace LibGameEditor.Data.Drawers
           {
             EditorGUILayout.LabelField(property.Name);
             if (value == null)
-            {
               value = Activator.CreateInstance(property.PropertyType, 0);
-            }
             Array arrayValue = value as Array;
 
             if (arrayValue != null)
@@ -125,8 +120,8 @@ namespace LibGameEditor.Data.Drawers
                 DataDrawer drawerInstance = Activator.CreateInstance(drawer) as DataDrawer;
                 drawerInstance?.Draw(element, i.ToString(), property, output =>
                 {
-                    // ReSharper disable once AccessToModifiedClosure
-                    arrayValue?.SetValue(output, index);
+                  // ReSharper disable once AccessToModifiedClosure
+                  arrayValue?.SetValue(output, index);
                 });
                 EditorGUILayout.EndVertical();
                 GUI.backgroundColor = Color.red;
@@ -137,13 +132,9 @@ namespace LibGameEditor.Data.Drawers
                   {
                     Array copy = Array.CreateInstance(t, arrayValue.Length - 1);
                     if (i > 0)
-                    {
                       Array.Copy(arrayValue, 0, copy, 0, i);
-                    }
                     if (i < arrayValue.Length - 1)
-                    {
                       Array.Copy(arrayValue, i + 1, copy, i, arrayValue.Length - i - 1);
-                    }
                     arrayValue = copy;
                   }
                 }
@@ -151,22 +142,18 @@ namespace LibGameEditor.Data.Drawers
 
                 EditorGUILayout.EndHorizontal();
                 if (i < arrayValue.Length - 1)
-                {
                   EditorGUILayout.Separator();
-                }
                 SwapBackgroundColor();
                 EditorGUI.indentLevel--;
               }
               GUI.backgroundColor = Color.green;
               EditorGUILayout.BeginHorizontal();
-              GUILayout.Space(EditorGUI.indentLevel * 20);
-              if (t != null && GUILayout.Button("+ " + t.Name))
+              GUILayout.Space(EditorGUI.indentLevel*20);
+              if ((t != null) && GUILayout.Button("+ " + t.Name))
               {
                 Array copy = Array.CreateInstance(t, arrayValue.Length + 1);
                 if (arrayValue.Length > 0)
-                {
                   Array.Copy(arrayValue, copy, arrayValue.Length);
-                }
                 arrayValue = copy;
 
                 // we create an instance of the element type and assign it to the array ? 
@@ -199,20 +186,14 @@ namespace LibGameEditor.Data.Drawers
       {
         object[] drawerAttr = property.GetCustomAttributes(typeof(LibCommon.Data.DataDrawAttribute), true);
         if (drawerAttr.Length > 0)
-        {
           drawer = GetDrawerCore(drawerAttr[0].GetType());
-        }
       }
 
-      if (drawer == null
-          && value != null)
-      {
+      if ((drawer == null)
+          && (value != null))
         drawer = GetDrawerCore(value.GetType());
-      }
       if (drawer == null)
-      {
         drawer = GetDrawerCore(property.PropertyType);
-      }
       return drawer ?? defaultDrawer;
     }
   }

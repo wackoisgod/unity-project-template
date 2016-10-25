@@ -9,7 +9,8 @@ namespace LibCommon.Commands
   {
     public CommandGroupAttribute Attributes { get; private set; }
 
-    private readonly Dictionary<CommandAttribute, MethodInfo> _commands = new Dictionary<CommandAttribute, MethodInfo>();
+    private readonly Dictionary<CommandAttribute, MethodInfo> _commands =
+      new Dictionary<CommandAttribute, MethodInfo>();
 
     public IEnumerable<CommandAttribute> CommandAttributes => _commands.Keys.AsEnumerable();
 
@@ -27,7 +28,7 @@ namespace LibCommon.Commands
         object[] attributes = method.GetCustomAttributes(typeof(CommandAttribute), true);
         if (attributes.Length == 0) continue;
 
-        CommandAttribute attribute = (CommandAttribute)attributes[0];
+        CommandAttribute attribute = (CommandAttribute) attributes[0];
         if (attribute is DefaultCommand) continue;
 
         if (!_commands.ContainsKey(attribute))
@@ -52,26 +53,26 @@ namespace LibCommon.Commands
 
     public virtual string Handle(string parameters)
     {
-      string[] @params = null;
+      string[] paramaters = null;
       CommandAttribute target;
 
       if (parameters == string.Empty)
         target = GetDefaultSubcommand();
       else
       {
-        @params = parameters.Split(' ');
-        target = GetSubcommand(@params[0]) ?? GetDefaultSubcommand();
+        paramaters = parameters.Split(' ');
+        target = GetSubcommand(paramaters[0]) ?? GetDefaultSubcommand();
 
         if (!Equals(target, GetDefaultSubcommand()))
-          @params = @params.Skip(1).ToArray();
+          paramaters = paramaters.Skip(1).ToArray();
       }
 
       MethodInfo methodInfo;
-      if (!_commands.TryGetValue(target, out methodInfo) || methodInfo == null) return "Unknown Command\n";
+      if (!_commands.TryGetValue(target, out methodInfo) || (methodInfo == null)) return "Unknown Command\n";
 
       try
       {
-        return (string)methodInfo.Invoke(this, new object[] { @params });
+        return (string) methodInfo.Invoke(this, new object[] {paramaters});
       }
       catch (Exception e)
       {

@@ -49,9 +49,7 @@ namespace LibGameClient.Manager
 
       UIController[] controllers = UIRootGameObject.GetComponentsInChildren<UIController>(true);
       foreach (UIController item in controllers)
-      {
         _controllers.Add(item);
-      }
     }
 
     public override void Begin()

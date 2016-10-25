@@ -79,14 +79,12 @@ namespace LibGameClient.Data
     public bool DeferredRelease;
 
     public static Dictionary<string, Queue<AssetBundleLoader>> PendingBundleRequest =
-        new Dictionary<string, Queue<AssetBundleLoader>>();
+      new Dictionary<string, Queue<AssetBundleLoader>>();
 
     public static void OnBundleDownloaded(bool inValue, UnityAssetLoader.AsyncBundleWebRequest request)
     {
       if (!inValue)
-      {
         return;
-      }
 
       bool isReleaseDeferred = false;
 
@@ -120,7 +118,7 @@ namespace LibGameClient.Data
       }
 
       if (!isReleaseDeferred
-          && request.AssetBundle != null)
+          && (request.AssetBundle != null))
       {
         request.AssetBundle.Unload(false);
         request.AssetBundle = null;
@@ -165,9 +163,7 @@ namespace LibGameClient.Data
 
       // if we find the bundle is in flight then we can just piggy back off its completion!
       if (PendingBundleRequest.ContainsKey(BundleName))
-      {
         PendingBundleRequest[BundleName].Enqueue(this);
-      }
       else
       {
         PendingBundleRequest[BundleName] = new Queue<AssetBundleLoader>();
@@ -186,11 +182,9 @@ namespace LibGameClient.Data
 
           GameManager.Instance.StartCoroutine(request.DownloadRequest());
         };
-        if (bundleData.dependencies == null
-            || bundleData.dependencies.Length == 0)
-        {
+        if ((bundleData.dependencies == null)
+            || (bundleData.dependencies.Length == 0))
           loadFunc();
-        }
         else
         {
           List<AssetBundleLoader> dependencyLoaders = new List<AssetBundleLoader>();
@@ -198,13 +192,12 @@ namespace LibGameClient.Data
           _dependencyMainHook += () =>
           {
             for (int k = 0; k < dependencyLoaders.Count; k++)
-            {
               dependencyLoaders[k].UnloadBundle();
-            }
           };
           for (int i = 0; i < bundleData.dependencies.Length; i++)
           {
-            AssetManifest.BundleInfo dependencyBundle = AssetManager.Instance.GetBundleInfoByName(bundleData.dependencies[i]);
+            AssetManifest.BundleInfo dependencyBundle =
+              AssetManager.Instance.GetBundleInfoByName(bundleData.dependencies[i]);
             string dependencyGuid = dependencyBundle.guids[0];
 
             AssetBundleLoader assetLoader = FromGuid(dependencyGuid);
@@ -213,9 +206,7 @@ namespace LibGameClient.Data
             assetLoader.OnCompleteLoading += asset =>
             {
               if (--dependencyCount == 0)
-              {
                 loadFunc();
-              }
             };
             AssetManager.Instance.RequestAssetLoad(assetLoader);
           }
@@ -244,13 +235,13 @@ namespace LibGameClient.Data
   {
     public bool DeferredRelease;
 
-    public static Dictionary<string, Queue<BulkAssetBundleLoader>> PendingBundleRequest = new Dictionary<string, Queue<BulkAssetBundleLoader>>();
+    public static Dictionary<string, Queue<BulkAssetBundleLoader>> PendingBundleRequest =
+      new Dictionary<string, Queue<BulkAssetBundleLoader>>();
+
     public static void OnBundleDownloaded(bool inValue, UnityAssetLoader.AsyncBundleWebRequest request)
     {
       if (!inValue)
-      {
         return;
-      }
 
       bool isReleaseDeferred = false;
 
@@ -284,7 +275,7 @@ namespace LibGameClient.Data
       }
 
       if (!isReleaseDeferred
-          && request.AssetBundle != null)
+          && (request.AssetBundle != null))
       {
         request.AssetBundle.Unload(false);
         request.AssetBundle = null;
@@ -320,7 +311,6 @@ namespace LibGameClient.Data
 
     public override void Load()
     {
-
       AssetManifest.BundleInfo bundleData = AssetManager.Instance.GetBundleInfoByName(BundleName);
 
       if (bundleData == null)
@@ -334,9 +324,7 @@ namespace LibGameClient.Data
 
       // if we find the bundle is in flight then we can just piggy back off its completion!
       if (PendingBundleRequest.ContainsKey(BundleName))
-      {
         PendingBundleRequest[BundleName].Enqueue(this);
-      }
       else
       {
         PendingBundleRequest[BundleName] = new Queue<BulkAssetBundleLoader>();
@@ -355,11 +343,9 @@ namespace LibGameClient.Data
           GameManager.Instance.StartCoroutine(request.DownloadRequest());
         };
 
-        if (bundleData.dependencies == null
-                || bundleData.dependencies.Length == 0)
-        {
+        if ((bundleData.dependencies == null)
+            || (bundleData.dependencies.Length == 0))
           loadFunc();
-        }
         else
         {
           List<BulkAssetBundleLoader> dependencyLoaders = new List<BulkAssetBundleLoader>();
@@ -367,20 +353,19 @@ namespace LibGameClient.Data
           _dependencyMainHook += () =>
           {
             for (int k = 0; k < dependencyLoaders.Count; k++)
-            {
               dependencyLoaders[k].UnloadBundle();
-            }
           };
           for (int i = 0; i < bundleData.dependencies.Length; i++)
           {
             Debug.Log("depends " + bundleData.dependencies[i] + " " + bundleData.name);
-            AssetManifest.BundleInfo dependencyBundle = AssetManager.Instance.GetBundleInfoByName(bundleData.dependencies[i]);
+            AssetManifest.BundleInfo dependencyBundle =
+              AssetManager.Instance.GetBundleInfoByName(bundleData.dependencies[i]);
             Debug.Log("dependencyBundle " + dependencyBundle.name);
 
             BulkAssetBundleLoader assetLoader = FromGuids(bundleData.dependencies[i]);
             assetLoader.DeferredRelease = true;
             dependencyLoaders.Add(assetLoader);
-            assetLoader.OnCompleteLoading += (asset) =>
+            assetLoader.OnCompleteLoading += asset =>
             {
               BulkAssetBundleLoader bulkAssetBundleLoader = asset as BulkAssetBundleLoader;
               if (bulkAssetBundleLoader != null)
@@ -526,9 +511,7 @@ namespace LibGameClient.Data
       request.OnCompleteDownload += OnCompleteDownload;
 
       foreach (KeyValuePair<string, string> item in Headers)
-      {
         request.Request.Headers[item.Key] = item.Value;
-      }
 
       request.PostData = PostData;
       GameManager.Instance.StartCoroutine(request.DownloadRequest());
@@ -615,9 +598,7 @@ namespace LibGameClient.Data
           request.Method = WebRequestMethods.Http.Get;
 
           foreach (KeyValuePair<string, string> item in Headers)
-          {
             request.Headers[item.Key] = item.Value;
-          }
 
           try
           {
@@ -628,7 +609,6 @@ namespace LibGameClient.Data
               _isDone = true;
               _dataStream = response.GetResponseStream();
             }
-
           }
           catch (WebException)
           {

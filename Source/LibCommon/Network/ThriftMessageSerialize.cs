@@ -38,9 +38,7 @@ namespace LibCommon.Network
     public static string Serialize(TBase tbase)
     {
       if (tbase == null)
-      {
         return null;
-      }
 
       using (MemoryStream outputStream = new MemoryStream())
       {
@@ -53,10 +51,8 @@ namespace LibCommon.Network
 
     public static void DeSerialize<T>(T tbase, string inJSON) where T : TBase
     {
-      if (tbase == null || inJSON == null)
-      {
+      if ((tbase == null) || (inJSON == null))
         return;
-      }
 
       byte[] bytes = Encoding.UTF8.GetBytes(inJSON);
       using (MemoryStream inputStream = new MemoryStream())
@@ -74,9 +70,7 @@ namespace LibCommon.Network
     public static byte[] SerializeCompact(TBase tbase)
     {
       if (tbase == null)
-      {
         return null;
-      }
 
       using (MemoryStream outputStream = new MemoryStream())
       {
@@ -89,10 +83,8 @@ namespace LibCommon.Network
 
     public static void DeSerializeCompact<T>(T tbase, byte[] inJSON) where T : TBase
     {
-      if (tbase == null || inJSON == null)
-      {
+      if ((tbase == null) || (inJSON == null))
         return;
-      }
 
       byte[] bytes = inJSON;
 

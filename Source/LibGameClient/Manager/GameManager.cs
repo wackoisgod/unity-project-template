@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using LibCommon.Logging;
 using LibCommon.Manager;
 using LibGameClient.Logging.Targets;
-using Logger = LibCommon.Logging.Logger;
 using UnityEngine;
-
+using Logger = LibCommon.Logging.Logger;
 
 // ReSharper disable UnusedMember.Local
 
@@ -69,13 +68,11 @@ namespace LibGameClient.Manager
 
     private void SetupManagers()
     {
-      List<BaseManager> mm = new List<BaseManager> { new AssetManager(), new UIManager() };
+      List<BaseManager> mm = new List<BaseManager> {new AssetManager(), new UIManager()};
 
       _managers = mm.ToArray();
       foreach (BaseManager c in _managers)
-      {
         c.Init();
-      }
     }
 
     private bool _started;
@@ -89,9 +86,7 @@ namespace LibGameClient.Manager
       {
         _started = true;
         foreach (BaseManager c in _managers)
-        {
           c.Begin();
-        }
       }
 
       StartCoroutine(StartGame());
@@ -110,17 +105,13 @@ namespace LibGameClient.Manager
       float dt = Time.deltaTime;
 
       foreach (BaseManager c in _managers)
-      {
         c.Update(time, dt);
-      }
     }
 
     private void OnDestroy()
     {
       foreach (BaseManager c in _managers)
-      {
         c.Destroy();
-      }
     }
   }
 }

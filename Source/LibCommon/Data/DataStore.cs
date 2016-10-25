@@ -15,9 +15,7 @@ namespace LibCommon.Data
     {
       BaseData output;
       if (Instance._data.TryGetValue(id, out output))
-      {
         return output as T;
-      }
       return null;
     }
 
@@ -29,9 +27,7 @@ namespace LibCommon.Data
     public static void AddData(BaseData[] datas)
     {
       foreach (BaseData data in datas)
-      {
         AddData(data);
-      }
     }
 
     public static int[] GetAllIds(Type dataType)

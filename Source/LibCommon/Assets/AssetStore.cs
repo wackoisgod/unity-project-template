@@ -19,9 +19,7 @@ namespace LibCommon.Assets
     public static bool GetAsset(string guid, out object asset)
     {
       if (_instance != null)
-      {
         return _instance.GetAssetInternal(guid, out asset);
-      }
       asset = null;
       return false;
     }
@@ -29,9 +27,7 @@ namespace LibCommon.Assets
     public static bool IsAssetLoaded(string guid)
     {
       if (_instance != null)
-      {
         return _instance.IsAssetLoadedInternal(guid);
-      }
       return false;
     }
 

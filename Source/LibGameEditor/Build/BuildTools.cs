@@ -1,13 +1,13 @@
-﻿using LibGameEditor.Build.Bundles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LibGameEditor.Build.Bundles;
 using UnityEditor;
 using UnityEngine;
 
 namespace LibGameEditor.Build
 {
-  class BuildTools
+  internal class BuildTools
   {
     public static string[] GetScenes()
     {
@@ -27,12 +27,13 @@ namespace LibGameEditor.Build
     [MenuItem("Build/Standalone/Windows Player/Assets")]
     public static void BuildWindowsStandaloneAssets()
     {
-      AssetBundler.BuildAssetBundles(Application.dataPath + "/../../Build/StandaloneWindows/Assets/", BuildTarget.StandaloneWindows);
+      AssetBundler.BuildAssetBundles(Application.dataPath + "/../../Build/StandaloneWindows/Assets/",
+        BuildTarget.StandaloneWindows);
     }
 
     private static void Build(string[] levels, BuildTarget buildTarget, string deployPath, string ext, bool debug = true)
     {
-      BuildOptions buildOptions = debug ? (BuildOptions.AllowDebugging | BuildOptions.Development) : BuildOptions.None;
+      BuildOptions buildOptions = debug ? BuildOptions.AllowDebugging | BuildOptions.Development : BuildOptions.None;
 
       const string productName = "goblin";
 

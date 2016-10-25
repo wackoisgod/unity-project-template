@@ -57,21 +57,15 @@ namespace LibGameEditor.Data
       {
         GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
         if (_currentTab != i)
-        {
           buttonStyle.normal = buttonStyle.active;
-        }
         if (GUILayout.Button(_tabs[i].Data.Name, buttonStyle))
-        {
           _currentTab = i;
-        }
 
         if (!GUILayout.Button("X", buttonStyle, GUILayout.ExpandWidth(false))) continue;
 
         _tabs.RemoveAt(i);
         if (i <= _currentTab)
-        {
           _currentTab--;
-        }
       }
       GUILayout.EndHorizontal();
 

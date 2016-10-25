@@ -44,7 +44,7 @@ namespace LibCommon.Logging
     private void Log(Level level, string message, object[] args)
     {
       LogRouter.RouteMessage(level, Name,
-          args == null ? message : string.Format(CultureInfo.InvariantCulture, message, args));
+        args == null ? message : string.Format(CultureInfo.InvariantCulture, message, args));
     }
   }
 }

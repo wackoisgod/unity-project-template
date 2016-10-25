@@ -14,13 +14,9 @@ namespace LibGameClient.UI.Controllers
     public void OnVisualStateChange(UIController inController, UIController.VisualState inState, bool inValue)
     {
       if (inState == UIController.VisualState.Shown)
-      {
         InitLoading();
-      }
       else
-      {
         gameObject.SetActive(false);
-      }
     }
 
     public void InitLoading()
@@ -35,9 +31,7 @@ namespace LibGameClient.UI.Controllers
       Debug.Log("FinishedLoading");
 
       if (inErrors != 0)
-      {
         Debug.Log("We have thrown a warning while loading " + inErrors);
-      }
 
       UIManager.Instance.PopUIController(UIManager.UIControllerID.Loading);
       GameManager.Instance.CurrentApplicationState = GameManager.ApplicationState.MainMenu;

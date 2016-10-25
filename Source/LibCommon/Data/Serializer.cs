@@ -39,7 +39,7 @@ namespace LibCommon.Data
 
     public static T Deserialize<T>(string path)
     {
-      return (T)Deserialize(typeof(T), path);
+      return (T) Deserialize(typeof(T), path);
     }
 
     private static object Deserialize(Type dataType, Stream stream, Type[] extraTypes)
@@ -68,7 +68,7 @@ namespace LibCommon.Data
 
     public static T Deserialize<T>(byte[] bytes)
     {
-      return (T)Deserialize(typeof(T), bytes);
+      return (T) Deserialize(typeof(T), bytes);
     }
 
     public static object Deserialize(Type dataType, byte[] bytes)
@@ -122,26 +122,28 @@ namespace LibCommon.Data
             if (polymorphicAttr.Length > 0)
             {
               Type[] subclasses =
-                DataUtils.GetSubclasses(p.PropertyType.HasElementType ? p.PropertyType.GetElementType() : p.PropertyType);
+                DataUtils.GetSubclasses(p.PropertyType.HasElementType
+                  ? p.PropertyType.GetElementType()
+                  : p.PropertyType);
               foreach (Type subType in subclasses)
               {
                 if (!polymorphicTypes.Contains(subType))
-                {
                   polymorphicTypes.AddRange(GetPolymorphicTypes(subType, processedTypes));
-                }
               }
               polymorphicTypes.AddRange(subclasses);
             }
 
             if (p.PropertyType.HasElementType)
             {
-              polymorphicTypes.AddRange(GetPolymorphicTypes(p.PropertyType.GetElementType(), processedTypes));
+              polymorphicTypes.AddRange(GetPolymorphicTypes(p.PropertyType.GetElementType(),
+                processedTypes));
             }
-            else if (!p.PropertyType.IsPrimitive
-                     && p.PropertyType != typeof(string)
-                     && !polymorphicTypes.Contains(p.PropertyType))
+            else
             {
-              GetPolymorphicTypes(p.PropertyType, processedTypes);
+              if (!p.PropertyType.IsPrimitive
+                  && (p.PropertyType != typeof(string))
+                  && !polymorphicTypes.Contains(p.PropertyType))
+                GetPolymorphicTypes(p.PropertyType, processedTypes);
             }
           }
         }

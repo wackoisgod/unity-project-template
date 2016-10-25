@@ -58,7 +58,7 @@ namespace LibGameClient.Network
 
         MasterServerConnection = _masterGameObject.AddComponent<NetworkManager>();
         MasterServerConnection.StartMatchMaker();
-        MasterServerConnection.matchMaker.SetProgramAppID((AppID)222651);
+        MasterServerConnection.matchMaker.SetProgramAppID((AppID) 222651);
       }
     }
   }
@@ -97,12 +97,12 @@ namespace LibGameClient.Network
       _clientConnection.RegisterHandler(MsgType.Disconnect, OnServerDisconnect);
     }
 
-    void OnConnectedToServer()
+    private void OnConnectedToServer()
     {
       OnConnected?.Invoke();
     }
 
-    void OnDisconnectFromServer()
+    private void OnDisconnectFromServer()
     {
       OnDisconnect?.Invoke();
     }
@@ -145,36 +145,28 @@ namespace LibGameClient.Network
         NetworkServer.Listen(new MatchInfo(matchResponse), 25000);
 
         Utility.SetAccessTokenForNetwork(matchResponse.networkId,
-            new NetworkAccessToken(matchResponse.accessTokenString));
+          new NetworkAccessToken(matchResponse.accessTokenString));
 
         UnityMatchmaking.Instance.MasterServerConnection.matchMaker.JoinMatch(matchResponse.networkId, "",
-            OnServerMatchJoined);
+          OnServerMatchJoined);
         UnityMatchmaking.Instance.LastGameId = matchResponse.networkId;
       }
       else
-      {
         Debug.LogError("Create match failed");
-      }
     }
 
     public void OnServerMatchJoined(JoinMatchResponse matchJoin)
     {
       if (matchJoin.success)
-      {
         _clientConnection = ClientScene.ConnectLocalServer();
-      }
       else
-      {
         Debug.LogError("Join match failed");
-      }
     }
 
     public void OnMatchDestroy(BasicResponse matchResponse)
     {
       if (matchResponse.success)
-      {
         Debug.Log("YAY");
-      }
     }
 
     public void OnPlayerConnected(NetworkMessage msg)
@@ -253,14 +245,12 @@ namespace LibGameClient.Network
       if (_clientConnection != null)
         _clientConnection.Send(100, bb);
       else
-      {
         OnClientPacket?.Invoke(inValue, "-1");
-      }
     }
 
     public void Shutdown()
     {
-      if (IsServer || _clientConnection == null) return;
+      if (IsServer || (_clientConnection == null)) return;
 
       _clientConnection.Disconnect();
       _clientConnection = null;
@@ -289,13 +279,13 @@ namespace LibGameClient.Network
     }
 
     public override void SendCommandRemote(QueueType inQueue,
-        LibCommon.Network.Types.GameMessage inEvent)
+      LibCommon.Network.Types.GameMessage inEvent)
     {
       byte[] msg = ThriftMessageSerialize.SerializeCompact(inEvent);
 
       if (inQueue == QueueType.Client)
       {
-        if (String.IsNullOrEmpty(inEvent.NetworkId))
+        if (string.IsNullOrEmpty(inEvent.NetworkId))
         {
           //_internalNetwork.BroadcastAll(NetworkUtils.SerializeEvent(inEvent));
 
@@ -308,19 +298,13 @@ namespace LibGameClient.Network
           Debug.Log(inEvent.NetworkId);
 
           if (inEvent.NetworkId == "-1")
-          {
             ClientQueue.Enqueue(inEvent);
-          }
           else
-          {
             _internalNetwork.SendPacketToClient(inEvent.NetworkId, msg);
-          }
         }
       }
       else
-      {
         _internalNetwork.SendToServer(msg);
-      }
     }
 
     public override LibCommon.Network.Types.GameMessage PopCommand(QueueType inQueue)
@@ -354,21 +338,22 @@ namespace LibGameClient.Network
     }
 
     public override void SendCommandLocal(QueueType inQueue,
-        LibCommon.Network.Types.GameMessage inEvent)
+      LibCommon.Network.Types.GameMessage inEvent)
     {
       if (inQueue == QueueType.Client)
       {
         ClientQueue.Enqueue(inEvent);
       }
-      else if (inQueue == QueueType.Server)
+      else
       {
-        ServerQueue.Enqueue(inEvent);
+        if (inQueue == QueueType.Server)
+          ServerQueue.Enqueue(inEvent);
       }
     }
 
     public override void Shutdown()
     {
-      DestroyMatchRequest d = new DestroyMatchRequest { networkId = 0 };
+      DestroyMatchRequest d = new DestroyMatchRequest {networkId = 0};
 
       Debug.Log(Utility.GetAppID().ToString());
       Debug.Log(Utility.GetAccessTokenForNetwork(d.networkId).GetByteString());
@@ -379,9 +364,7 @@ namespace LibGameClient.Network
     public void OnMatchDestroy(BasicResponse matchResponse)
     {
       if (matchResponse.success)
-      {
         Debug.Log("YAY");
-      }
 
       NetworkServer.DisconnectAll();
       NetworkServer.Shutdown();
@@ -464,18 +447,14 @@ namespace LibGameClient.Network
     }
 
     public override void SendCommandRemote(QueueType inQueue,
-        LibCommon.Network.Types.GameMessage inEvent)
+      LibCommon.Network.Types.GameMessage inEvent)
     {
       byte[] msg = ThriftMessageSerialize.SerializeCompact(inEvent);
 
       if (inQueue == QueueType.Client)
-      {
         ClientQueue.Enqueue(inEvent);
-      }
       else
-      {
         _internalNetwork.SendToServer(msg);
-      }
     }
 
     public override LibCommon.Network.Types.GameMessage PopCommand(QueueType inQueue)
@@ -495,7 +474,7 @@ namespace LibGameClient.Network
     }
 
     public override void SendCommandLocal(QueueType inQueue,
-        LibCommon.Network.Types.GameMessage inEvent)
+      LibCommon.Network.Types.GameMessage inEvent)
     {
       switch (inQueue)
       {

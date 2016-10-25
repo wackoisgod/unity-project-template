@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LibCommon.Data
+﻿namespace LibCommon.Data
 {
   public class AssetReferenceAttribute : DataDrawAttribute
   {
@@ -19,8 +17,8 @@ namespace LibCommon.Data
 
     public AssetReferenceAttribute()
     {
-      BundleOverride = String.Empty;
-      DependentBundle = String.Empty;
+      BundleOverride = string.Empty;
+      DependentBundle = string.Empty;
     }
   }
 }

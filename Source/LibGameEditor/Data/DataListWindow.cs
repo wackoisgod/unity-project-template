@@ -37,21 +37,17 @@ namespace LibGameEditor.Data
         string typeName = t.ToString();
 
         IOrderedEnumerable<DataEditorCache.DataInfo> dataInstances = (from info in DataEditorCache.Instance.Data
-          where (info.Type == typeName && info.Name.Contains(_searchString))
+          where (info.Type == typeName) && info.Name.Contains(_searchString)
           select info).OrderBy(info => info.Name);
 
         Color textColor = Color.black;
         if (!dataInstances.Any())
-        {
           textColor = Color.gray;
-        }
         GUIStyle style = EditorStyles.foldout;
         style.normal.textColor = textColor;
         Expanded[i] = EditorGUILayout.Foldout(Expanded[i], t.Name, style);
         if (GUILayout.Button("Create"))
-        {
           DataCreationWindow.Create(t, Callback);
-        }
         GUI.color = Color.white;
         GUILayout.EndHorizontal();
 

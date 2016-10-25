@@ -11,13 +11,9 @@ namespace LibCommon.Network
       lock (_lockObject)
       {
         if (inQueue == QueueType.Client)
-        {
           ClientQueue.Enqueue(inMsg);
-        }
-        else if (inQueue == QueueType.Server)
-        {
+        else
           ServerQueue.Enqueue(inMsg);
-        }
       }
     }
 
@@ -26,13 +22,9 @@ namespace LibCommon.Network
       lock (_lockObject)
       {
         if (inQueue == QueueType.Client)
-        {
           ClientQueue.Enqueue(inMsg);
-        }
-        else if (inQueue == QueueType.Server)
-        {
+        else
           ServerQueue.Enqueue(inMsg);
-        }
       }
     }
 
@@ -42,14 +34,9 @@ namespace LibCommon.Network
       {
         GameMessage ee = null;
         if (inQueue == QueueType.Client)
-        {
           ee = ClientQueue.Dequeue();
-        }
-        else if (inQueue == QueueType.Server)
-        {
+        else
           ee = ServerQueue.Dequeue();
-        }
-
         return ee;
       }
     }

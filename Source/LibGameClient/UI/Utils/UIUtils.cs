@@ -26,7 +26,7 @@ namespace LibGameClient.UI.Utils
 
       Transform t = inObject.transform.parent;
 
-      while (t != null && comp == null)
+      while ((t != null) && (comp == null))
       {
         comp = t.gameObject.GetComponent<T>();
         t = t.parent;
@@ -35,7 +35,8 @@ namespace LibGameClient.UI.Utils
       return comp;
     }
 
-    public static TCompType GetChildOfTypeWithName<TCompType>(GameObject go, string compName) where TCompType : Component
+    public static TCompType GetChildOfTypeWithName<TCompType>(GameObject go, string compName)
+      where TCompType : Component
     {
       // if we have a game object
       if (null == go) return null;

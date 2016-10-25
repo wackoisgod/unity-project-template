@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace LibCommon.Commands
 {
   public static class CommandManager
   {
-    private static readonly Dictionary<CommandGroupAttribute, CommandGroup> CommandGroups = new Dictionary<CommandGroupAttribute, CommandGroup>();
+    private static readonly Dictionary<CommandGroupAttribute, CommandGroup> CommandGroups =
+      new Dictionary<CommandGroupAttribute, CommandGroup>();
 
     static CommandManager()
     {
@@ -24,12 +24,13 @@ namespace LibCommon.Commands
         {
           if (!type.IsSubclassOf(typeof(CommandGroup))) continue;
 
-          CommandGroupAttribute[] attributes = (CommandGroupAttribute[])type.GetCustomAttributes(typeof(CommandGroupAttribute), true);
+          CommandGroupAttribute[] attributes =
+            (CommandGroupAttribute[]) type.GetCustomAttributes(typeof(CommandGroupAttribute), true);
           if (attributes.Length == 0) continue;
 
           CommandGroupAttribute groupAttribute = attributes[0];
 
-          CommandGroup group = (CommandGroup)Activator.CreateInstance(type);
+          CommandGroup group = (CommandGroup) Activator.CreateInstance(type);
           group.Register(groupAttribute);
           CommandGroups.Add(groupAttribute, group);
         }
@@ -47,9 +48,7 @@ namespace LibCommon.Commands
       if (line.Trim() == string.Empty) return "No valid command";
 
       if (!ExtractCommandAndParameters(line, out command, out parameters))
-      {
         return "Failed to parse Command";
-      }
 
       foreach (KeyValuePair<CommandGroupAttribute, CommandGroup> pair in CommandGroups)
       {

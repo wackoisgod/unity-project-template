@@ -122,9 +122,7 @@ namespace LibCommon.Manager
             task.OnComplete();
           }
           else
-          {
             QueueUserWorkItem(task);
-          }
         }
       }
     }
@@ -180,13 +178,9 @@ namespace LibCommon.Manager
       {
         AssetLoadRequest cpTask = _internalCompletedQueue.Dequeue();
         if (cpTask.HasFailed)
-        {
           cpTask.OnFailure();
-        }
         else
-        {
           cpTask.OnComplete();
-        }
       }
     }
 
@@ -212,15 +206,11 @@ namespace LibCommon.Manager
     public AssetManifest.BundleInfo GetBundleInfoByGuid(string inAssetGuid)
     {
       if (_assetMapping.Count == 0)
-      {
         return null;
-      }
 
       AssetManifest.BundleInfo data;
       if (_assetMapping.TryGetValue(inAssetGuid, out data) == false)
-      {
         return null;
-      }
 
       return data;
     }
