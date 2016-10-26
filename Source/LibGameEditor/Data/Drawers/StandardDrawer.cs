@@ -18,15 +18,11 @@ namespace LibGameEditor.Data.Drawers
       {
         object[] attrs = prop.GetCustomAttributes(typeof(DisplayOrderAttribute), true);
         if (attrs.Length > 0)
-        {
           return ((DisplayOrderAttribute) attrs[0]).Order;
-        }
         return DefaultDrawOrder;
       });
       foreach (PropertyInfo subProperty in sortedProperties)
-      {
         DrawProperty(subProperty, input);
-      }
       setValueCallback(input);
     }
   }

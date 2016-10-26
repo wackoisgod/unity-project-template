@@ -5,6 +5,8 @@ using LibCommon.Data;
 using UnityEditor;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Local
+
 namespace LibGameEditor.Data
 {
   public class DataCreationWindow : EditorWindow
@@ -28,9 +30,7 @@ namespace LibGameEditor.Data
         {
           id = UnityEngine.Random.Range(1, int.MaxValue);
           if (DataEditorCache.Instance.Data.Any(info => info.Id == id))
-          {
             uniqueId = false;
-          }
         } while (!uniqueId);
 
         if (window._data != null)
@@ -39,7 +39,7 @@ namespace LibGameEditor.Data
           window._data.Name = DefaultDataName;
         }
         window._dataPath = "Data" + Path.DirectorySeparatorChar + dataType.Name + Path.DirectorySeparatorChar +
-                          DefaultDataName;
+                           DefaultDataName;
         window._callback = callback;
       }
       window.Show();
@@ -55,10 +55,8 @@ namespace LibGameEditor.Data
       if (GUILayout.Button("Create Data"))
       {
         string directoryPath = Path.GetDirectoryName(FullPath);
-        if (directoryPath != null && !Directory.Exists(directoryPath))
-        {
+        if ((directoryPath != null) && !Directory.Exists(directoryPath))
           Directory.CreateDirectory(directoryPath);
-        }
         Serializer.Serialize(_data.GetType(), _data, FullPath);
         AssetDatabase.Refresh();
         _callback(_data, FullPath);
@@ -69,9 +67,7 @@ namespace LibGameEditor.Data
       bool autoPath = _dataPath.EndsWith(_data.Name);
       _data.Name = EditorGUILayout.TextField("Name:", _data.Name);
       if (autoPath)
-      {
         _dataPath = Path.GetDirectoryName(_dataPath) + Path.DirectorySeparatorChar + _data.Name;
-      }
 
       _dataPath = EditorGUILayout.TextField("Path:", _dataPath);
     }

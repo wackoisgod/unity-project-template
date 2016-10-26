@@ -106,34 +106,6 @@ namespace LibCommon.Data
       }
     }
 
-    private static List<Type> GetPolymorphicTypes(object obj)
-    {
-      List<Type> processedTypes = new List<Type>();
-      List<Type> polymorphicTypes = GetPolymorphicTypes(obj.GetType(), processedTypes);
-      PropertyInfo[] properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-      foreach (PropertyInfo p in properties)
-      {
-        object subObj = p.GetValue(obj, null);
-        Array arrayObj = subObj as Array;
-        if (arrayObj != null)
-        {
-          for (int i = 0; i < arrayObj.Length; i++)
-          {
-            object element = arrayObj.GetValue(i);
-            polymorphicTypes.AddRange(GetPolymorphicTypes(element));
-          }
-        }
-        else if (subObj != null
-                 && !subObj.GetType().IsPrimitive
-                 && subObj.GetType() != typeof(string))
-        {
-          polymorphicTypes.AddRange(GetPolymorphicTypes(subObj));
-        }
-      }
-
-      return polymorphicTypes;
-    }
-
     private static List<Type> GetPolymorphicTypes(Type t, List<Type> processedTypes)
     {
       List<Type> polymorphicTypes = new List<Type>();
@@ -150,26 +122,28 @@ namespace LibCommon.Data
             if (polymorphicAttr.Length > 0)
             {
               Type[] subclasses =
-                DataUtils.GetSubclasses(p.PropertyType.HasElementType ? p.PropertyType.GetElementType() : p.PropertyType);
+                DataUtils.GetSubclasses(p.PropertyType.HasElementType
+                  ? p.PropertyType.GetElementType()
+                  : p.PropertyType);
               foreach (Type subType in subclasses)
               {
                 if (!polymorphicTypes.Contains(subType))
-                {
                   polymorphicTypes.AddRange(GetPolymorphicTypes(subType, processedTypes));
-                }
               }
               polymorphicTypes.AddRange(subclasses);
             }
 
             if (p.PropertyType.HasElementType)
             {
-              polymorphicTypes.AddRange(GetPolymorphicTypes(p.PropertyType.GetElementType(), processedTypes));
+              polymorphicTypes.AddRange(GetPolymorphicTypes(p.PropertyType.GetElementType(),
+                processedTypes));
             }
-            else if (!p.PropertyType.IsPrimitive
-                     && p.PropertyType != typeof(string)
-                     && !polymorphicTypes.Contains(p.PropertyType))
+            else
             {
-              GetPolymorphicTypes(p.PropertyType, processedTypes);
+              if (!p.PropertyType.IsPrimitive
+                  && (p.PropertyType != typeof(string))
+                  && !polymorphicTypes.Contains(p.PropertyType))
+                GetPolymorphicTypes(p.PropertyType, processedTypes);
             }
           }
         }

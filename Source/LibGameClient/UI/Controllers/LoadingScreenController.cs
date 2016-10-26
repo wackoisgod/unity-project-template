@@ -14,13 +14,9 @@ namespace LibGameClient.UI.Controllers
     public void OnVisualStateChange(UIController inController, UIController.VisualState inState, bool inValue)
     {
       if (inState == UIController.VisualState.Shown)
-      {
         InitLoading();
-      }
       else
-      {
         gameObject.SetActive(false);
-      }
     }
 
     public void InitLoading()
@@ -34,6 +30,9 @@ namespace LibGameClient.UI.Controllers
     {
       Debug.Log("FinishedLoading");
 
+      if (inErrors != 0)
+        Debug.Log("We have thrown a warning while loading " + inErrors);
+
       UIManager.Instance.PopUIController(UIManager.UIControllerID.Loading);
       GameManager.Instance.CurrentApplicationState = GameManager.ApplicationState.MainMenu;
     }
@@ -41,7 +40,7 @@ namespace LibGameClient.UI.Controllers
     private void OfflinePhaseOneLoad()
     {
       // lets load it from disk!
-      var dataPath = Application.persistentDataPath + "/Data/AssetManifest.xml";
+      string dataPath = Application.persistentDataPath + "/Data/AssetManifest.xml";
       if (File.Exists(dataPath))
       {
         //var manifestData = File.ReadAllBytes(dataPath);
@@ -54,7 +53,7 @@ namespace LibGameClient.UI.Controllers
     private void PhaseTwoLoad()
     {
       // load the data store with the downloaded data ? 
-      var ccDataLoad = new ClientDataLoader();
+      ClientDataLoader ccDataLoad = new ClientDataLoader();
       ccDataLoad.OnDataLoadComplete += errors => { PhaseThreeLoad(); };
       ccDataLoad.PopulateDataStore();
     }
@@ -67,7 +66,7 @@ namespace LibGameClient.UI.Controllers
     private void PhaseFourLoad()
     {
       // we loaded the data and no we should load the MainMenu scene ? 
-      var loadMainMenu = new AsyncSceneLoader("GameScene");
+      AsyncSceneLoader loadMainMenu = new AsyncSceneLoader("GameScene");
       loadMainMenu.OnCompleteLoading += asset =>
       {
         // we now have loaded everything we should have we can now move to the next

@@ -13,9 +13,7 @@ namespace LibGameEditor.Data
     {
       DataInfo[] info = GetAllData();
       for (int i = 0; i < info.Length; i++)
-      {
         Serializer.Serialize(info[i].Data.GetType(), info[i].Data, info[i].Path);
-      }
     }
 
     public class DataInfo
@@ -55,9 +53,7 @@ namespace LibGameEditor.Data
     {
       DataInfo[] data = GetAllData();
       for (int i = 0; i < data.Length; i++)
-      {
         dataCallback(data[i]);
-      }
     }
 
     public static DataInfo GetData(int id)

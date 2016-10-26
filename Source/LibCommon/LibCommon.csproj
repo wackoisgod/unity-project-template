@@ -25,6 +25,7 @@
         <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-common-debug" />
       </CustomCommands>
     </CustomCommands>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,10 +42,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Thrift">
       <HintPath>..\Dependecies\Thrift\Thrift.dll</HintPath>
@@ -54,6 +51,10 @@
     <Compile Include="Assets\AssetManifest.cs" />
     <Compile Include="Assets\AssetStore.cs" />
     <Compile Include="Base\Flag.cs" />
+    <Compile Include="Commands\CommandAttribute.cs" />
+    <Compile Include="Commands\CommandConsole.cs" />
+    <Compile Include="Commands\CommandGroup.cs" />
+    <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Data\Attributes\AssetReferenceAttribute.cs" />
     <Compile Include="Data\Attributes\DataDrawAttribute.cs" />
     <Compile Include="Data\Attributes\DataReferenceAttribute.cs" />
@@ -94,7 +95,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition="'$(OS)' != 'Unix'">
-      <PostBuildEvent>if $(Configuration) == Debug (
+    <PostBuildEvent>if $(Configuration) == Debug (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-debug ) else if $(Configuration) == Release (
 $(SolutionDir)..\External\Tools\apache-ant\bin\ant -f $(SolutionDir)..\build.xml copy-common-release ) ELSE (
 echo "Invalid build configuration. Skipping post-build event."

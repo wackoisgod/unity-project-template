@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using LibCommon.Logging;
 using LibCommon.Manager;
+using LibGameClient.Logging.Targets;
 using UnityEngine;
+using Logger = LibCommon.Logging.Logger;
+
+// ReSharper disable UnusedMember.Local
 
 namespace LibGameClient.Manager
 {
@@ -51,6 +56,10 @@ namespace LibGameClient.Manager
 
         DontDestroyOnLoad(gameObject);
 
+        // Add in the logger support for the UnityLogTarget
+        LogManager.IsEnabled = true;
+        LogManager.AttachLogTarget(new UnityLogTarget(Logger.Level.Trace, Logger.Level.Error, true));
+
         StartupTime = DateTime.Now;
 
         SetupManagers();
@@ -63,23 +72,21 @@ namespace LibGameClient.Manager
 
       _managers = mm.ToArray();
       foreach (BaseManager c in _managers)
-      {
         c.Init();
-      }
     }
 
     private bool _started;
-      public string GAMESERVERURL;
 
-      private void Start()
+    // ReSharper disable once InconsistentNaming
+    public string GAMESERVERURL;
+
+    private void Start()
     {
       if (!_started)
       {
         _started = true;
         foreach (BaseManager c in _managers)
-        {
           c.Begin();
-        }
       }
 
       StartCoroutine(StartGame());
@@ -98,17 +105,13 @@ namespace LibGameClient.Manager
       float dt = Time.deltaTime;
 
       foreach (BaseManager c in _managers)
-      {
         c.Update(time, dt);
-      }
     }
 
     private void OnDestroy()
     {
       foreach (BaseManager c in _managers)
-      {
         c.Destroy();
-      }
     }
   }
 }

@@ -19,13 +19,14 @@ namespace LibGameClient.UI.Utils
       if (inObject == null)
         return null;
 
-      var comp = inObject.GetComponent<T>();
+      T comp = inObject.GetComponent<T>();
+
       if (comp != null)
         return comp;
 
       Transform t = inObject.transform.parent;
 
-      while (t != null && comp == null)
+      while ((t != null) && (comp == null))
       {
         comp = t.gameObject.GetComponent<T>();
         t = t.parent;
@@ -34,16 +35,14 @@ namespace LibGameClient.UI.Utils
       return comp;
     }
 
-    public static CompType GetChildOfTypeWithName<CompType>(GameObject go, string compName) where CompType : Component
+    public static TCompType GetChildOfTypeWithName<TCompType>(GameObject go, string compName)
+      where TCompType : Component
     {
       // if we have a game object
-      if (null != go)
-      {
-        CompType[] subComps = go.GetComponentsInChildren<CompType>(true);
-        return Array.Find(subComps, x => x.name == compName);
-      }
+      if (null == go) return null;
 
-      return null;
+      TCompType[] subComps = go.GetComponentsInChildren<TCompType>(true);
+      return Array.Find(subComps, x => x.name == compName);
     }
   }
 }

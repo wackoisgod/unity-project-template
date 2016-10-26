@@ -25,6 +25,7 @@
         <Command type="AfterBuild" command="$(SolutionDir)/../External/Tools/apache-ant/bin/ant -f $(SolutionDir)/../build.xml copy-gameclient-debug" />
       </CustomCommands>
     </CustomCommands>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,11 +42,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="Thrift">
       <HintPath>..\Dependecies\Thrift\Thrift.dll</HintPath>
     </Reference>
@@ -63,6 +59,7 @@
     <Compile Include="Assets\ClientAssetStore.cs" />
     <Compile Include="Data\ClientDataLoader.cs" />
     <Compile Include="Data\UnityAssetLoaders.cs" />
+    <Compile Include="Logging\Targets\UnityLogTarget.cs" />
     <Compile Include="Manager\GameManager.cs" />
     <Compile Include="Manager\UIManager.cs" />
     <Compile Include="Network\HttpNetDriver.cs" />

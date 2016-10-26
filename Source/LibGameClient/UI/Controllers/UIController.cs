@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 
 namespace LibGameClient.UI.Controllers
 {
-  [DisallowMultipleComponent, ExecuteInEditMode]
+  [DisallowMultipleComponent]
+  [ExecuteInEditMode]
   public class UIController : MonoBehaviour
   {
     public enum VisualState
@@ -17,7 +18,7 @@ namespace LibGameClient.UI.Controllers
 
     [SerializeField] private UIManager.UIControllerID _controllerId = UIManager.UIControllerID.None;
 
-    public UIManager.UIControllerID ID => _controllerId;
+    public UIManager.UIControllerID Id => _controllerId;
 
     [Serializable]
     public class VisualStateEvent : UnityEvent<UIController, VisualState, bool>
@@ -30,7 +31,7 @@ namespace LibGameClient.UI.Controllers
 
     protected virtual bool IsActive()
     {
-      return (enabled && gameObject.activeInHierarchy);
+      return enabled && gameObject.activeInHierarchy;
     }
 
     public void OnSelect(BaseEventData eventData)

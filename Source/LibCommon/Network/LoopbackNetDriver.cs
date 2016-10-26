@@ -1,65 +1,48 @@
-﻿namespace LibCommon.Network
+﻿using LibCommon.Network.Types;
+
+namespace LibCommon.Network
 {
-    public class LoopbackNetDriver : BaseNetDriver
+  public class LoopbackNetDriver : BaseNetDriver
+  {
+    private readonly object _lockObject = new object();
+
+    public override void SendCommandRemote(QueueType inQueue, GameMessage inMsg)
     {
-        private readonly object _lockObject = new object();
-
-        public override void SendCommandRemote(QueueType inQueue, LibCommon.Network.Types.GameMessage inMsg)
-        {
-            lock (_lockObject)
-            {
-                switch (inQueue)
-                {
-                    case QueueType.Client:
-                        ClientQueue.Enqueue(inMsg);
-                        break;
-                    case QueueType.Server:
-                        ServerQueue.Enqueue(inMsg);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        public override void SendCommandLocal(QueueType inQueue, LibCommon.Network.Types.GameMessage inMsg)
-        {
-            lock (_lockObject)
-            {
-                switch (inQueue)
-                {
-                    case QueueType.Client:
-                        ClientQueue.Enqueue(inMsg);
-                        break;
-                    case QueueType.Server:
-                        ServerQueue.Enqueue(inMsg);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        public override LibCommon.Network.Types.GameMessage PopCommand(QueueType inQueue)
-        {
-            lock (_lockObject)
-            {
-                LibCommon.Network.Types.GameMessage ee = null;
-                if (inQueue == QueueType.Client)
-                {
-                    ee = ClientQueue.Dequeue();
-                }
-                else if (inQueue == QueueType.Server)
-                {
-                    ee = ServerQueue.Dequeue();
-                }
-
-                return ee;
-            }
-        }
-
-        public override void Shutdown()
-        {
-        }
+      lock (_lockObject)
+      {
+        if (inQueue == QueueType.Client)
+          ClientQueue.Enqueue(inMsg);
+        else
+          ServerQueue.Enqueue(inMsg);
+      }
     }
+
+    public override void SendCommandLocal(QueueType inQueue, GameMessage inMsg)
+    {
+      lock (_lockObject)
+      {
+        if (inQueue == QueueType.Client)
+          ClientQueue.Enqueue(inMsg);
+        else
+          ServerQueue.Enqueue(inMsg);
+      }
+    }
+
+    public override GameMessage PopCommand(QueueType inQueue)
+    {
+      lock (_lockObject)
+      {
+        GameMessage ee = null;
+        if (inQueue == QueueType.Client)
+          ee = ClientQueue.Dequeue();
+        else
+          ee = ServerQueue.Dequeue();
+        return ee;
+      }
+    }
+
+    public override void Shutdown()
+    {
+    }
+  }
 }

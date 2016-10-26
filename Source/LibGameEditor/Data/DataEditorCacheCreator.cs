@@ -15,19 +15,15 @@ namespace LibGameEditor.Data
     {
       DataEditorCache.MarkDirty();
       for (int i = 0; i < importedAssets.Length; i++)
-      {
         UnityEngine.Debug.Log(importedAssets[i]);
-      }
       if (_updatingFile)
-      {
         _updatingFile = false;
-      }
       else
       {
-        if (Array.IndexOf(importedAssets, DataEditorCache.UnityCachePath) >= 0
-            || Array.IndexOf(deletedAssets, DataEditorCache.UnityCachePath) >= 0
-            || Array.IndexOf(movedAssets, DataEditorCache.UnityCachePath) >= 0
-            || Array.IndexOf(movedFromAssets, DataEditorCache.UnityCachePath) >= 0
+        if ((Array.IndexOf(importedAssets, DataEditorCache.UnityCachePath) >= 0)
+            || (Array.IndexOf(deletedAssets, DataEditorCache.UnityCachePath) >= 0)
+            || (Array.IndexOf(movedAssets, DataEditorCache.UnityCachePath) >= 0)
+            || (Array.IndexOf(movedFromAssets, DataEditorCache.UnityCachePath) >= 0)
             || !System.IO.File.Exists(DataEditorCache.FullCachePath))
         {
           //Full rebuild
@@ -126,40 +122,32 @@ namespace LibGameEditor.Data
           {
             using (
               System.IO.FileStream fs = new System.IO.FileStream(DataEditorCache.FullCachePath, System.IO.FileMode.Open)
-              )
+            )
             {
               oldBytes = new byte[fs.Length];
               fs.Read(oldBytes, 0, (int) fs.Length);
             }
           }
           else
-          {
             _updatingFile = true;
-          }
           Save(cache);
           if (oldBytes != null)
           {
             using (
               System.IO.FileStream fs = new System.IO.FileStream(DataEditorCache.FullCachePath, System.IO.FileMode.Open)
-              )
+            )
             {
               byte[] newBytes = new byte[fs.Length];
               fs.Read(newBytes, 0, (int) fs.Length);
 
               if (oldBytes.Length != newBytes.Length)
-              {
                 _updatingFile = true;
-              }
               for (int i = 0; i < newBytes.Length; i++)
               {
                 if (oldBytes[i] != newBytes[i])
-                {
                   _updatingFile = true;
-                }
                 if (_updatingFile)
-                {
                   break;
-                }
               }
             }
           }
@@ -181,9 +169,7 @@ namespace LibGameEditor.Data
       foreach (Type t in DataUtils.GetDataTypes())
       {
         if (Serializer.CanDeserialize(t, xml))
-        {
           return t;
-        }
       }
       return null;
     }
