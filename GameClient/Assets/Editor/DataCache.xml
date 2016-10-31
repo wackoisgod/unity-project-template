@@ -3,7 +3,7 @@
   <Data>
     <DataInfo>
       <Name>TestCard</Name>
-      <FilePath>/Data/CardData/TestCard.xml</FilePath>
+      <FilePath>\Data\CardData\TestCard.xml</FilePath>
       <Id>471975402</Id>
       <Type>LibCommon.Data.Game.CardData</Type>
     </DataInfo>
