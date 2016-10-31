@@ -13,7 +13,8 @@ namespace LibGameEditor.Data
 
     private class Tab
     {
-      public BaseData Data { get; }
+      // ReSharper disable once MemberCanBePrivate.Local
+      public BaseData Data { get; set; }
       public readonly string Path;
 
       public Tab(BaseData inputData, string savePath)
