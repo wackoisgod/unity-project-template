@@ -14,3 +14,6 @@ Source - All the dlls required for the project, these get built and moved to the
 * Visual Studio 2015 (Or Latest Xamarin Studio)
 * Latest Java
 
+# Contributors
+* Andrew Spiering
+* Jeff Aydelotte
